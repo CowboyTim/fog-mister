@@ -1,0 +1,7 @@
+# Name,   Type, SubType, Offset,  Size, Flags
+nvs,      data, nvs,     36k,      20k,
+otadata,  data, ota,     56k,       8k,
+app0,     app,  ota_0,   64k,       2M,
+esp-at,   data, nvs,        ,      64k,
+logdata,  data, spiffs,     ,       1M,
+coredump, data, coredump,   ,      64k, encrypted
