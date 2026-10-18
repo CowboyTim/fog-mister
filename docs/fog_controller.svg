@@ -1,0 +1,270 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1400 1010" width="1400" height="1010">
+<style>
+text{font-family:Helvetica,Arial,sans-serif;fill:#1d1d1f}
+.t{font-size:15px;font-weight:bold}
+.s{font-size:11.5px;fill:#555}
+.p{font-size:11px;fill:#333}
+.n{font-size:11px;fill:#666;font-style:italic}
+.h{font-size:22px;font-weight:bold}
+.box{fill:#f6f7f9;stroke:#333;stroke-width:1.5}
+.mcu{fill:#e9f1fb;stroke:#2b5aa0;stroke-width:2}
+.dev{fill:#fff6e8;stroke:#a86a10;stroke-width:1.5}
+.w{fill:none;stroke-width:2;stroke-linejoin:round;stroke-linecap:round}
+.mains{stroke:#8b4513;stroke-width:3.5;stroke-dasharray:10 5}
+.v12{stroke:#d22}
+.v5{stroke:#e07b00}
+.v33{stroke:#1a7fd4}
+.sig{stroke:#1d9a4a}
+.dmx{stroke:#7b3fbf}
+.iso{stroke:#c2187a}
+.gnd{stroke:#222}
+.c{fill:none;stroke:#222;stroke-width:1.6}
+.cable{fill:none;stroke:#7b3fbf;stroke-width:1;stroke-dasharray:4 3}
+</style>
+<rect width="1400" height="1010" fill="#fff"/>
+<text x="24" y="36" class="h" text-anchor="start">Fogbox controller (fog_controller)</text>
+<g transform="translate(0,40)">
+<rect x="40" y="40" width="160" height="60" rx="6" class="dev"/>
+<text x="120.0" y="62" class="t" text-anchor="middle">Fossibot F2400</text>
+<text x="120.0" y="79" class="s" text-anchor="middle">230 V AC out</text>
+<rect x="250" y="40" width="150" height="60" rx="6" class="box"/>
+<text x="325.0" y="62" class="t" text-anchor="middle">Portable RCD</text>
+<text x="325.0" y="79" class="s" text-anchor="middle">30 mA PRCD</text>
+<polyline points="200,70 250,70" class="w mains"/>
+<polyline points="400,70 1350,70" class="w mains"/>
+<text x="700" y="62" class="n" text-anchor="start">230 V AC: outdoor IP44 extensions, connectors off the ground, drip loops</text>
+<circle cx="520" cy="70" r="3.5" fill="#222"/>
+<polyline points="520,70 520,130" class="w mains"/>
+<circle cx="1245" cy="70" r="3.5" fill="#222"/>
+<polyline points="1245,70 1245,130" class="w mains"/>
+<circle cx="1350" cy="70" r="3.5" fill="#222"/>
+<polyline points="1350,70 1350,660" class="w mains"/>
+<rect x="440" y="130" width="160" height="70" rx="6" class="box"/>
+<text x="520.0" y="152" class="t" text-anchor="middle">12 V 60 W supply</text>
+<text x="520.0" y="169" class="s" text-anchor="middle">BRIMETI, IP67</text>
+<circle cx="480" cy="200" r="2.8" fill="#fff" stroke="#333" stroke-width="1.3"/>
+<text x="480" y="193" class="p" text-anchor="middle">+12V</text>
+<circle cx="560" cy="200" r="2.8" fill="#fff" stroke="#333" stroke-width="1.3"/>
+<text x="560" y="193" class="p" text-anchor="middle">−</text>
+<polyline points="480,200 480,222" class="w v12"/>
+<path d="M474,222 h12 l-6,8 z" fill="#d22"/>
+<text x="480" y="246" class="p" text-anchor="middle" style="fill:#d22;font-weight:bold">+12V</text>
+<path d="M560,200 v10 M550,210 h20 M554,215 h12 M557.5,220 h5" class="c"/>
+<rect x="100" y="280" width="160" height="90" rx="6" class="box"/>
+<text x="180.0" y="302" class="t" text-anchor="middle">Buck 12 → 5 V</text>
+<circle cx="140" cy="280" r="2.8" fill="#fff" stroke="#333" stroke-width="1.3"/>
+<text x="147" y="275" class="p" text-anchor="start">IN+</text>
+<polyline points="140,280 140,266" class="w v12"/>
+<path d="M134,266 h12 l-6,-8 z" fill="#d22"/>
+<text x="140" y="253" class="p" text-anchor="middle" style="fill:#d22;font-weight:bold">+12V</text>
+<circle cx="180" cy="370" r="2.8" fill="#fff" stroke="#333" stroke-width="1.3"/>
+<text x="180" y="363" class="p" text-anchor="middle">GND</text>
+<path d="M180,370 v10 M170,380 h20 M174,385 h12 M177.5,390 h5" class="c"/>
+<circle cx="260" cy="335" r="2.8" fill="#fff" stroke="#333" stroke-width="1.3"/>
+<text x="253" y="339" class="p" text-anchor="end">5V out</text>
+<polyline points="260,335 295,335 295,305 330,305" class="w v5"/>
+<rect x="330" y="270" width="220" height="460" rx="6" class="mcu"/>
+<text x="440.0" y="292" class="t" text-anchor="middle">ESP32-C3</text>
+<text x="440.0" y="309" class="s" text-anchor="middle">controller</text>
+<text x="440" y="440" class="s" text-anchor="middle">Wi-Fi AP “fogbox”, ch 1</text>
+<text x="440" y="456" class="s" text-anchor="middle">ESP-NOW ← trigger node</text>
+<text x="440" y="472" class="s" text-anchor="middle">web UI 192.168.4.1</text>
+<text x="440" y="500" class="s" text-anchor="middle">GPIO8: on-board LED</text>
+<circle cx="330" cy="305" r="2.8" fill="#fff" stroke="#333" stroke-width="1.3"/>
+<text x="337" y="309" class="p" text-anchor="start">5V</text>
+<circle cx="330" cy="360" r="2.8" fill="#fff" stroke="#333" stroke-width="1.3"/>
+<text x="337" y="364" class="p" text-anchor="start">GND</text>
+<polyline points="330,360 300,360" class="w gnd"/>
+<path d="M300,360 v10 M290,370 h20 M294,375 h12 M297.5,380 h5" class="c"/>
+<circle cx="330" cy="580" r="2.8" fill="#fff" stroke="#333" stroke-width="1.3"/>
+<text x="337" y="584" class="p" text-anchor="start">GPIO7</text>
+<circle cx="330" cy="660" r="2.8" fill="#fff" stroke="#333" stroke-width="1.3"/>
+<text x="337" y="664" class="p" text-anchor="start">GPIO10</text>
+<circle cx="550" cy="380" r="2.8" fill="#fff" stroke="#333" stroke-width="1.3"/>
+<text x="543" y="384" class="p" text-anchor="end">GPIO4</text>
+<circle cx="550" cy="520" r="2.8" fill="#fff" stroke="#333" stroke-width="1.3"/>
+<text x="543" y="524" class="p" text-anchor="end">GPIO5</text>
+<circle cx="550" cy="660" r="2.8" fill="#fff" stroke="#333" stroke-width="1.3"/>
+<text x="543" y="664" class="p" text-anchor="end">GPIO3</text>
+<circle cx="500" cy="730" r="2.8" fill="#fff" stroke="#333" stroke-width="1.3"/>
+<text x="500" y="723" class="p" text-anchor="middle">3V3</text>
+<polyline points="330,580 260,580" class="w sig"/>
+<path d="M160,580 H190.0 M230.0,580 H260" class="c"/>
+<circle cx="190.0" cy="580" r="2.5" fill="#222"/><circle cx="230.0" cy="580" r="2.5" fill="#222"/>
+<path d="M190.0,580 L228.0,567" class="c"/>
+<text x="210.0" y="602" class="p" text-anchor="middle">STOP toggle</text>
+<text x="210.0" y="616" class="p" text-anchor="middle">closed = all off</text>
+<polyline points="160,580 100,580" class="w gnd"/>
+<path d="M100,580 v10 M90,590 h20 M94,595 h12 M97.5,600 h5" class="c"/>
+<polyline points="330,660 260,660" class="w sig"/>
+<path d="M160,660 H190.0 M230.0,660 H260" class="c"/>
+<circle cx="190.0" cy="660" r="2.5" fill="#222"/><circle cx="230.0" cy="660" r="2.5" fill="#222"/>
+<path d="M188.0,651 H232.0 M210.0,651 V643 M204.0,643 h12" class="c"/>
+<text x="210.0" y="682" class="p" text-anchor="middle">Push button: group,</text>
+<text x="210.0" y="696" class="p" text-anchor="middle">hold 2 s = undo</text>
+<polyline points="160,660 100,660" class="w gnd"/>
+<path d="M100,660 v10 M90,670 h20 M94,675 h12 M97.5,680 h5" class="c"/>
+<rect x="700" y="330" width="180" height="100" rx="6" class="box"/>
+<text x="790.0" y="352" class="t" text-anchor="middle">MOSFET #1</text>
+<text x="790.0" y="369" class="s" text-anchor="middle">blower PWM</text>
+<polyline points="550,380 700,380" class="w sig"/>
+<text x="600" y="372" class="n" text-anchor="start">PWM 20 kHz</text>
+<circle cx="700" cy="380" r="2.8" fill="#fff" stroke="#333" stroke-width="1.3"/>
+<text x="707" y="384" class="p" text-anchor="start">TRIG</text>
+<circle cx="640" cy="380" r="3.5" fill="#222"/>
+<polyline points="640,380 640,396.0 646,398.0 634,402.0 646,406.0 634,410.0 646,414.0 634,418.0 646,422.0 640,424.0 640,440" class="c"/>
+<text x="650" y="414.0" class="p" text-anchor="start">10 kΩ</text>
+<path d="M640,440 v10 M630,450 h20 M634,455 h12 M637.5,460 h5" class="c"/>
+<circle cx="790" cy="330" r="2.8" fill="#fff" stroke="#333" stroke-width="1.3"/>
+<text x="797" y="325" class="p" text-anchor="start">VIN+</text>
+<polyline points="790,330 790,316" class="w v12"/>
+<path d="M784,316 h12 l-6,-8 z" fill="#d22"/>
+<text x="790" y="303" class="p" text-anchor="middle" style="fill:#d22;font-weight:bold">+12V</text>
+<circle cx="790" cy="430" r="2.8" fill="#fff" stroke="#333" stroke-width="1.3"/>
+<text x="790" y="423" class="p" text-anchor="middle">VIN−</text>
+<path d="M790,430 v10 M780,440 h20 M784,445 h12 M787.5,450 h5" class="c"/>
+<circle cx="880" cy="380" r="2.8" fill="#fff" stroke="#333" stroke-width="1.3"/>
+<text x="873" y="384" class="p" text-anchor="end">OUT+</text>
+<circle cx="880" cy="410" r="2.8" fill="#fff" stroke="#333" stroke-width="1.3"/>
+<text x="873" y="414" class="p" text-anchor="end">OUT−</text>
+<rect x="1060" y="330" width="120" height="100" rx="6" class="dev"/>
+<text x="1120.0" y="352" class="t" text-anchor="middle">Blower</text>
+<text x="1120" y="425" class="s" text-anchor="middle">3" 12 V bilge</text>
+<circle cx="1130" cy="395" r="14" class="c"/><text x="1130" y="400" class="t" text-anchor="middle">M</text>
+<circle cx="1060" cy="380" r="2.8" fill="#fff" stroke="#333" stroke-width="1.3"/>
+<text x="1067" y="384" class="p" text-anchor="start">+</text>
+<circle cx="1060" cy="410" r="2.8" fill="#fff" stroke="#333" stroke-width="1.3"/>
+<text x="1067" y="414" class="p" text-anchor="start">−</text>
+<polyline points="880,380 1060,380" class="w v12"/>
+<polyline points="880,410 1060,410" class="w gnd"/>
+<circle cx="990" cy="380" r="3.5" fill="#222"/>
+<circle cx="990" cy="410" r="3.5" fill="#222"/>
+<path d="M990,410 V402.0 M990,380 V388.0 M981,388.0 h18" class="c"/>
+<path d="M981,402.0 h18 l-9,-14 z" fill="#222"/>
+<text x="1003" y="399.0" class="p" text-anchor="start">SS34 / 1N5822</text>
+<text x="905" y="372" class="n" text-anchor="start">red</text>
+<text x="905" y="428" class="n" text-anchor="start">black</text>
+<rect x="700" y="500" width="180" height="100" rx="6" class="box"/>
+<text x="790.0" y="522" class="t" text-anchor="middle">MOSFET #2</text>
+<text x="790.0" y="539" class="s" text-anchor="middle">mister on/off</text>
+<polyline points="550,520 640,520 640,550 700,550" class="w sig"/>
+<circle cx="700" cy="550" r="2.8" fill="#fff" stroke="#333" stroke-width="1.3"/>
+<text x="707" y="554" class="p" text-anchor="start">TRIG</text>
+<circle cx="640" cy="550" r="3.5" fill="#222"/>
+<polyline points="640,550 640,566.0 646,568.0 634,572.0 646,576.0 634,580.0 646,584.0 634,588.0 646,592.0 640,594.0 640,610" class="c"/>
+<text x="650" y="584.0" class="p" text-anchor="start">10 kΩ</text>
+<path d="M640,610 v10 M630,620 h20 M634,625 h12 M637.5,630 h5" class="c"/>
+<circle cx="790" cy="500" r="2.8" fill="#fff" stroke="#333" stroke-width="1.3"/>
+<text x="797" y="495" class="p" text-anchor="start">VIN+</text>
+<polyline points="790,500 790,486" class="w v12"/>
+<path d="M784,486 h12 l-6,-8 z" fill="#d22"/>
+<text x="790" y="473" class="p" text-anchor="middle" style="fill:#d22;font-weight:bold">+12V</text>
+<circle cx="790" cy="600" r="2.8" fill="#fff" stroke="#333" stroke-width="1.3"/>
+<text x="790" y="593" class="p" text-anchor="middle">VIN−</text>
+<path d="M790,600 v10 M780,610 h20 M784,615 h12 M787.5,620 h5" class="c"/>
+<circle cx="880" cy="550" r="2.8" fill="#fff" stroke="#333" stroke-width="1.3"/>
+<text x="873" y="554" class="p" text-anchor="end">OUT+ (n.c.)</text>
+<circle cx="880" cy="580" r="2.8" fill="#fff" stroke="#333" stroke-width="1.3"/>
+<text x="873" y="584" class="p" text-anchor="end">OUT−</text>
+<rect x="1000" y="500" width="150" height="110" rx="6" class="box"/>
+<text x="1075.0" y="522" class="t" text-anchor="middle">SSR-40DD</text>
+<text x="1075" y="630" class="n" text-anchor="middle">heatsink, outside the cooler</text>
+<circle cx="1000" cy="545" r="2.8" fill="#fff" stroke="#333" stroke-width="1.3"/>
+<text x="1007" y="549" class="p" text-anchor="start">in+</text>
+<polyline points="1000,545 984,545" class="w v12"/>
+<path d="M984,539 v12 l-8,-6 z" fill="#d22"/>
+<text x="972" y="549" class="p" text-anchor="end" style="fill:#d22;font-weight:bold">+12V</text>
+<circle cx="1000" cy="580" r="2.8" fill="#fff" stroke="#333" stroke-width="1.3"/>
+<text x="1007" y="584" class="p" text-anchor="start">in−</text>
+<polyline points="880,580 1000,580" class="w sig"/>
+<circle cx="1150" cy="545" r="2.8" fill="#fff" stroke="#333" stroke-width="1.3"/>
+<text x="1143" y="549" class="p" text-anchor="end">out+</text>
+<circle cx="1150" cy="580" r="2.8" fill="#fff" stroke="#333" stroke-width="1.3"/>
+<text x="1143" y="584" class="p" text-anchor="end">out−</text>
+<rect x="1170" y="130" width="150" height="70" rx="6" class="dev"/>
+<text x="1245.0" y="152" class="t" text-anchor="middle">Mister brick</text>
+<text x="1245.0" y="169" class="s" text-anchor="middle">230 V AC → DC, 350 W</text>
+<circle cx="1200" cy="200" r="2.8" fill="#fff" stroke="#333" stroke-width="1.3"/>
+<text x="1200" y="193" class="p" text-anchor="middle">DC+</text>
+<circle cx="1290" cy="200" r="2.8" fill="#fff" stroke="#333" stroke-width="1.3"/>
+<text x="1290" y="193" class="p" text-anchor="middle">DC−</text>
+<polyline points="1200,200 1200,545 1150,545" class="w iso"/>
+<rect x="1230" y="500" width="100" height="110" rx="6" class="dev"/>
+<text x="1280.0" y="522" class="t" text-anchor="middle">Mister</text>
+<text x="1280.0" y="539" class="s" text-anchor="middle">8-head</text>
+<text x="1280.0" y="554" class="s" text-anchor="middle">ultrasonic</text>
+<circle cx="1230" cy="580" r="2.8" fill="#fff" stroke="#333" stroke-width="1.3"/>
+<text x="1237" y="584" class="p" text-anchor="start">+</text>
+<circle cx="1290" cy="500" r="2.8" fill="#fff" stroke="#333" stroke-width="1.3"/>
+<text x="1297" y="495" class="p" text-anchor="start">−</text>
+<polyline points="1150,580 1230,580" class="w iso"/>
+<polyline points="1290,200 1290,500" class="w iso"/>
+<text x="1190" y="280" class="n" text-anchor="end">isolated DC: never tied to GND</text>
+<text x="1190" y="294" class="n" text-anchor="end">check the brick's output is DC!</text>
+<rect x="700" y="650" width="180" height="150" rx="6" class="box"/>
+<text x="790.0" y="672" class="t" text-anchor="middle">MAX3485 module</text>
+<text x="790.0" y="689" class="s" text-anchor="middle">3.3 V RS-485</text>
+<polyline points="550,660 620,660 620,700 700,700" class="w dmx"/>
+<text x="565" y="652" class="n" text-anchor="start">DMX 250 kbaud</text>
+<circle cx="700" cy="700" r="2.8" fill="#fff" stroke="#333" stroke-width="1.3"/>
+<text x="707" y="704" class="p" text-anchor="start">DI</text>
+<circle cx="730" cy="800" r="2.8" fill="#fff" stroke="#333" stroke-width="1.3"/>
+<text x="730" y="793" class="p" text-anchor="middle">VCC</text>
+<circle cx="775" cy="800" r="2.8" fill="#fff" stroke="#333" stroke-width="1.3"/>
+<text x="775" y="793" class="p" text-anchor="middle">DE</text>
+<circle cx="820" cy="800" r="2.8" fill="#fff" stroke="#333" stroke-width="1.3"/>
+<text x="820" y="793" class="p" text-anchor="middle">/RE</text>
+<circle cx="860" cy="800" r="2.8" fill="#fff" stroke="#333" stroke-width="1.3"/>
+<text x="860" y="793" class="p" text-anchor="middle">GND</text>
+<path d="M860,800 v10 M850,810 h20 M854,815 h12 M857.5,820 h5" class="c"/>
+<polyline points="500,730 500,845 820,845" class="w v33"/>
+<polyline points="730,845 730,800" class="w v33"/>
+<polyline points="775,845 775,800" class="w v33"/>
+<polyline points="820,845 820,800" class="w v33"/>
+<circle cx="730" cy="845" r="3.5" fill="#222"/>
+<circle cx="775" cy="845" r="3.5" fill="#222"/>
+<text x="560" y="863" class="n" text-anchor="start">VCC, DE and /RE to 3V3 (transmit only)</text>
+<circle cx="880" cy="720" r="2.8" fill="#fff" stroke="#333" stroke-width="1.3"/>
+<text x="873" y="724" class="p" text-anchor="end">A</text>
+<circle cx="880" cy="745" r="2.8" fill="#fff" stroke="#333" stroke-width="1.3"/>
+<text x="873" y="749" class="p" text-anchor="end">B</text>
+<circle cx="880" cy="770" r="2.8" fill="#fff" stroke="#333" stroke-width="1.3"/>
+<text x="873" y="774" class="p" text-anchor="end">GND</text>
+<rect x="1170" y="660" width="200" height="130" rx="6" class="dev"/>
+<text x="1270.0" y="682" class="t" text-anchor="middle">BeamZ BLAZE1200</text>
+<text x="1270.0" y="699" class="s" text-anchor="middle">DMX mode, addr 1, ch 1 = fog</text>
+<circle cx="1170" cy="720" r="2.8" fill="#fff" stroke="#333" stroke-width="1.3"/>
+<text x="1177" y="724" class="p" text-anchor="start">pin 3 Data+</text>
+<circle cx="1170" cy="745" r="2.8" fill="#fff" stroke="#333" stroke-width="1.3"/>
+<text x="1177" y="749" class="p" text-anchor="start">pin 2 Data−</text>
+<circle cx="1170" cy="770" r="2.8" fill="#fff" stroke="#333" stroke-width="1.3"/>
+<text x="1177" y="774" class="p" text-anchor="start">pin 1 GND</text>
+<polyline points="880,720 1170,720" class="w dmx"/>
+<polyline points="880,745 1170,745" class="w dmx"/>
+<polyline points="880,770 1170,770" class="w gnd"/>
+<rect x="960" y="705" width="140" height="80" rx="8" class="cable"/>
+<text x="1030" y="803" class="n" text-anchor="middle">3-pin XLR DMX cable; 120 Ω across</text>
+<text x="1030" y="817" class="n" text-anchor="middle">pins 2–3 at the machine only if</text>
+<text x="1030" y="831" class="n" text-anchor="middle">it acts erratic</text>
+</g>
+<polyline points="40,920 74,920" class="w mains"/>
+<text x="84" y="924" class="p" text-anchor="start">230 V AC</text>
+<polyline points="40,940 74,940" class="w v12"/>
+<text x="84" y="944" class="p" text-anchor="start">+12 V</text>
+<polyline points="40,960 74,960" class="w v5"/>
+<text x="84" y="964" class="p" text-anchor="start">+5 V</text>
+<polyline points="40,980 74,980" class="w v33"/>
+<text x="84" y="984" class="p" text-anchor="start">+3.3 V</text>
+<polyline points="300,920 334,920" class="w sig"/>
+<text x="344" y="924" class="p" text-anchor="start">logic signal</text>
+<polyline points="300,940 334,940" class="w dmx"/>
+<text x="344" y="944" class="p" text-anchor="start">DMX / RS-485</text>
+<polyline points="300,960 334,960" class="w iso"/>
+<text x="344" y="964" class="p" text-anchor="start">isolated mister DC</text>
+<polyline points="300,980 334,980" class="w gnd"/>
+<text x="344" y="984" class="p" text-anchor="start">ground</text>
+<text x="560" y="924" class="p" text-anchor="start">All ground symbols are one common ground: 12 V supply −, buck, ESP32, MOSFET VIN−, MAX3485.</text>
+<text x="560" y="944" class="p" text-anchor="start">+12V flags all connect to the 12 V supply's + output. The mister's DC side stays isolated behind the SSR.</text>
+<text x="560" y="964" class="p" text-anchor="start">10 kΩ pull-downs keep the MOSFETs off while the ESP32 boots. Diode band (cathode) to blower +.</text>
+<text x="560" y="984" class="p" text-anchor="start">Fog machine stand: horizontal, 50 cm clear around vents, 5 cm gap from nozzle to the duct.</text>
+</svg>
