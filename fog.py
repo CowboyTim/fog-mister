@@ -41,10 +41,12 @@ CORE_VERSION = "3.3.12"
 SKETCHES = {"MISTER": "fog_mister", "TRIGGER": "fog_trigger"}
 ROLES = tuple(SKETCHES)
 
-# Per chip: arduino-cli FQBN and esptool --chip.
+# Per chip: arduino-cli FQBN, esptool --chip, and how the core derives the soft-AP MAC from the
+# base MAC: the C3 is built with 4 universal MACs (AP = base + 1), the S3 with 2 (AP = base with
+# the locally administered bit set, e.g. 9c:.. -> 9e:..).
 CHIPS = {
-    "esp32c3": {"fqbn": "esp32:esp32:esp32c3", "esptool": "esp32c3"},
-    "esp32s3": {"fqbn": "esp32:esp32:esp32s3", "esptool": "esp32s3"},
+    "esp32c3": {"fqbn": "esp32:esp32:esp32c3", "esptool": "esp32c3", "ap_mac": "plus1"},
+    "esp32s3": {"fqbn": "esp32:esp32:esp32s3", "esptool": "esp32s3", "ap_mac": "local"},
 }
 # no_ota partition table: bootloader at 0x0, table at 0x8000, NVS at 0x9000 (the mister's
 # settings, never written here), otadata at 0xe000 (boot_app0 selects app0), app at 0x10000.
@@ -74,11 +76,17 @@ def norm_mac(mac):
     return ":".join(h[i:i + 2] for i in range(0, 12, 2)).lower()
 
 
-def ap_mac(mac):
-    """The soft-AP MAC of a board: base MAC + 1 (the core uses four universal MACs)."""
-    n = (int(mac.replace(":", ""), 16) + 1) & 0xFFFFFFFFFFFF
-    h = f"{n:012x}"
-    return ":".join(h[i:i + 2] for i in range(0, 12, 2))
+def ap_mac(board):
+    """The soft-AP MAC of a board, derived from its base MAC the way the core does it."""
+    b = [int(x, 16) for x in board["mac"].split(":")]
+    if CHIPS[board["chip"]]["ap_mac"] == "plus1":
+        n = (int("".join(f"{x:02x}" for x in b), 16) + 1) & 0xFFFFFFFFFFFF
+        b = [(n >> (40 - 8 * i)) & 0xFF for i in range(6)]
+    else:
+        # esp_derive_local_mac(): set the locally administered bit, flip bit 2 if that changes nothing
+        first = b[0] | 0x02
+        b[0] = first if first != b[0] else first ^ 0x04
+    return ":".join(f"{x:02x}" for x in b)
 
 
 # ---- boards.toml ------------------------------------------------------------
@@ -172,8 +180,8 @@ def present(picked, required, port, wait_for_required=False):
 
 
 def mister_mac(boards, board):
-    """Base MAC of the mister a TRIGGER talks to: the board's 'mister' key, else the only
-    MISTER. None (the trigger then finds the mister by broadcast) when it has no mac yet."""
+    """The MISTER board a TRIGGER talks to: the board's 'mister' key, else the only MISTER.
+    None (the trigger then finds the mister by broadcast) when it has no mac yet."""
     if board["mister"]:
         peer = boards.get(board["mister"])
         if not peer or peer["role"] != "MISTER":
@@ -187,7 +195,7 @@ def mister_mac(boards, board):
     if not misters[0]["mac"]:
         print(f"({board['name']}: mister '{misters[0]['name']}' has no mac in boards.toml, "
               f"the trigger will find it by broadcast)")
-    return misters[0]["mac"]
+    return misters[0] if misters[0]["mac"] else None
 
 
 # ---- ports ------------------------------------------------------------------

@@ -61,7 +61,8 @@ python3 docs/gen_schematics.py docs
   format changes incompatibly.
 - **`ESPNOW_CHANNEL`** must be equal on both boards and match the
   mister box's AP channel. `fog.py` passes the trigger the mister box's
-  soft-AP MAC (base MAC + 1) as `-DMISTER_MAC`.
+  soft-AP MAC as `-DMISTER_MAC`, derived per chip in `ap_mac()` (S3: locally
+  administered bit set, C3: base + 1). The mister prints its AP MAC at boot.
 - **Pin assignments:** a pin change touches the `#define`s in `main.cpp`, the
   schematic generator (then regenerate the SVGs) and the pin tables in
   `README.md`.

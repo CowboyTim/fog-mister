@@ -36,7 +36,9 @@
 #define AP_SSID         "fogbox"
 #define AP_PASS         "boo-fog-2026"
 #define ESPNOW_CHANNEL  1
+#ifndef TX_POWER
 #define TX_POWER        WIFI_POWER_19_5dBm  // SuperMini boards: try WIFI_POWER_8_5dBm
+#endif
 
 /* ---- outputs ---- */
 #define DMX_SLOTS       32      // BLAZE uses 8; a short frame is valid DMX
@@ -642,12 +644,24 @@ void setup() {
     pinMode(BUTTON_PIN, INPUT_PULLUP);
 
     Serial.begin(115200);
+#ifdef BOOT_DEBUG
+    // -DBOOT_DEBUG: time to open the serial port before anything else starts
+    for (int i = 8; i > 0; i--) {
+        Serial.printf("boot debug: reset reason %d, starting in %d s\n", (int)esp_reset_reason(), i);
+        delay(1000);
+    }
+#define BOOT_STEP(s) (Serial.println("boot: " s), Serial.flush())
+#else
+#define BOOT_STEP(s) ((void)0)
+#endif
     Serial.println("fog_mister starting");
     load_settings();
+    BOOT_STEP("settings loaded");
 
     Serial1.setTxBufferSize(256);
     Serial1.begin(250000, SERIAL_8N2, -1, DMX_TX_PIN);
-    xTaskCreate(dmx_task, "dmx", 2048, nullptr, 5, nullptr);
+    xTaskCreate(dmx_task, "dmx", 4096, nullptr, 5, nullptr);
+    BOOT_STEP("dmx started");
 
     WiFi.mode(WIFI_AP);
     WiFi.softAP(AP_SSID, AP_PASS, ESPNOW_CHANNEL);
@@ -656,17 +670,20 @@ void setup() {
     Serial.printf("AP %s on %s, MAC %s\n", AP_SSID, WiFi.softAPIP().toString().c_str(),
                   WiFi.softAPmacAddress().c_str());
 
+    BOOT_STEP("wifi up");
     rx_queue = xQueueCreate(16, sizeof(RxEvent));
     if (esp_now_init() != ESP_OK)
         Serial.println("ESP-NOW init failed");
     esp_now_register_recv_cb(on_recv);
 
+    BOOT_STEP("esp-now up");
     server.on("/", HTTP_GET, [] { server.send_P(200, "text/html", PAGE); });
     server.on("/status", HTTP_GET, send_status);
     server.on("/settings", HTTP_GET, send_settings);
     server.on("/settings", HTTP_POST, post_settings);
     server.on("/cmd", HTTP_POST, post_cmd);
     server.begin();
+    BOOT_STEP("web server up");
 }
 
 void loop() {

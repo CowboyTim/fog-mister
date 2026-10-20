@@ -3,7 +3,8 @@
  * fog_mister over ESP-NOW that a group is coming. A marshal presses the
  * button, or an optional PIR sensor does it.
  *
- * Button: short press = group coming, hold 2 s = undo last group.
+ * Button (GPIO3, or the on-board BOOT button): short press = group coming,
+ * hold 2 s = undo last group.
  * LED: short blip every 2 s = link OK, blinking twice a second = no link,
  * flicker = sending, on for 1.5 s = mister confirmed, three long
  * flashes = not confirmed.
@@ -18,6 +19,11 @@
 
 /* ---- pins ---- */
 #define BUTTON_PIN      3   // push button to GND
+#if CONFIG_IDF_TARGET_ESP32S3
+#define BOOT_BUTTON_PIN 0   // on-board BOOT button: same function once running (bench testing)
+#else
+#define BOOT_BUTTON_PIN 9   // on-board BOOT button (C3)
+#endif
 #define PIR_PIN         4   // AM312 output, powered from 3V3
 #if CONFIG_IDF_TARGET_ESP32S3
 #define LED_PIN         48  // on-board LED (S3 SuperMini: WS2812 RGB, shown blue)
@@ -33,7 +39,9 @@
 #define USE_SENSOR      false
 #define PIR_LOCKOUT_MS  45000   // one group per PIR trigger
 #define ESPNOW_CHANNEL  1       // must match the mister's AP channel
+#ifndef TX_POWER
 #define TX_POWER        WIFI_POWER_19_5dBm  // SuperMini boards: try WIFI_POWER_8_5dBm
+#endif
 #define PING_EVERY_MS   2000
 #define LINK_TIMEOUT_MS 6500
 #define RETRY_MS        250
@@ -222,12 +230,14 @@ struct Button {
     }
 };
 static Button button{BUTTON_PIN};
+static Button boot_button{BOOT_BUTTON_PIN};
 
 void setup() {
     if (!LED_RGB)
         pinMode(LED_PIN, OUTPUT);
     led(false);
     pinMode(BUTTON_PIN, INPUT_PULLUP);
+    pinMode(BOOT_BUTTON_PIN, INPUT_PULLUP);
     if (USE_SENSOR)
         pinMode(PIR_PIN, INPUT);
 
@@ -250,9 +260,11 @@ void setup() {
 void loop() {
     uint32_t now = millis();
 
-    switch (button.poll(now)) {
-    case 1: queue_send(MSG_GROUP, now); break;
-    case 2: queue_send(MSG_UNDO, now); break;
+    for (Button *b : {&button, &boot_button}) {
+        switch (b->poll(now)) {
+        case 1: queue_send(MSG_GROUP, now); break;
+        case 2: queue_send(MSG_UNDO, now); break;
+        }
     }
 
     if (USE_SENSOR) {

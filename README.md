@@ -82,6 +82,7 @@ output is DC before using the DC-switching SSR-40DD.
 | Trigger pin | Goes to | Note |
 | --- | --- | --- |
 | GPIO3 | Push button → GND | Short = group coming, hold 2 s = undo |
+| GPIO0 | On-board BOOT button | Same as the push button once running (GPIO9 on a C3) |
 | GPIO4 | PIR output | Optional, set `USE_SENSOR` to `true` |
 | GPIO48 | On-board RGB LED | WS2812 on the S3 SuperMini, shown blue (C3 build: GPIO8, active low) |
 | USB | Power bank | About 80 mA |
@@ -109,6 +110,10 @@ python3 fog.py monitor all               # serial output of both, prefixed with 
 If flashing fails with a timeout or `Protocol error` (a board stuck in a reset
 loop, or a flaky USB link), hold **BOOT**, press **RESET**, release BOOT, and
 flash with `--no-reset`: `python3 fog.py flash mister --no-reset`.
+
+To see a board's boot in detail, build with `--flags=-DBOOT_DEBUG` (mister
+only): it waits 8 s after power-on, printing the reset reason, so there is time
+to open the serial port, then logs each init step.
 
 A board name, a role (any case) or `all` selects boards; a role with a spare
 flashes whichever of them is plugged in. The trigger is built with the mister
@@ -213,7 +218,8 @@ number.
 
 - The trigger pings every 2 s; the link is OK while acks keep arriving.
 - Built by `fog.py`, the trigger knows the mister box's MAC from `boards.toml`
-  (`-DMISTER_MAC`, the soft-AP MAC = base MAC + 1) and unicasts from boot,
+  (`-DMISTER_MAC`, its soft-AP MAC: on the S3 the base MAC with the locally
+  administered bit set, `9c:…` → `9e:…`; on the C3 base + 1) and unicasts from boot,
   ignoring acks from any other board. Built without it, it broadcasts until
   the first ack, then unicasts to that board.
 - `GROUP` and `UNDO` are resent every 250 ms, up to 8 times, until acked.
