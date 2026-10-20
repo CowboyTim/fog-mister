@@ -1,10 +1,10 @@
 /*
- * fog_controller - runs the fogbox: fog machine over DMX, ultrasonic mister
+ * fog_mister - runs the fogbox: fog machine over DMX, ultrasonic mister
  * via an SSR, and the blower via PWM. Groups are announced by the trigger
  * node over ESP-NOW (or the button / web page); each one gets a timed
  * build-up, hold, tail and purge cycle timed to its arrival.
  *
- * Board: ESP32-C3, Espressif Arduino core 3.3.x, USB CDC On Boot enabled.
+ * Board: ESP32-S3 or ESP32-C3 SuperMini, Espressif Arduino core 3.3.x, USB CDC On Boot enabled.
  *
  * Web UI: join Wi-Fi "fogbox" and open http://192.168.4.1
  */
@@ -21,9 +21,16 @@
 #define BLOWER_PIN      4   // MOSFET module #1 TRIG/PWM
 #define MISTER_PIN      5   // MOSFET module #2 TRIG -> SSR input
 #define STOP_PIN        7   // toggle to GND, closed = everything off
-#define LED_PIN         8   // on-board LED (SuperMini: blue, active low)
 #define BUTTON_PIN      10  // push button to GND
-#define LED_ACTIVE_LOW  1
+#if CONFIG_IDF_TARGET_ESP32S3
+#define LED_PIN         48  // on-board LED (S3 SuperMini: WS2812 RGB, shown blue)
+#define LED_RGB         1
+#define LED_RGB_LEVEL   40  // 0-255, it is bright
+#else
+#define LED_PIN         8   // on-board LED (C3 SuperMini: blue, active low)
+#define LED_RGB         0
+#endif
+#define LED_ACTIVE_LOW  1   // plain LED only
 
 /* ---- radio ---- */
 #define AP_SSID         "fogbox"
@@ -361,7 +368,17 @@ struct Button {
 };
 static Button button{BUTTON_PIN};
 
-static void led(bool on) { digitalWrite(LED_PIN, (on ^ LED_ACTIVE_LOW) ? HIGH : LOW); }
+static void led(bool on) {
+#if LED_RGB
+    static int last = -1;  // the WS2812 takes an RMT write; only send changes
+    if (on == last)
+        return;
+    last = on;
+    rgbLedWrite(LED_PIN, 0, 0, on ? LED_RGB_LEVEL : 0);
+#else
+    digitalWrite(LED_PIN, (on ^ LED_ACTIVE_LOW) ? HIGH : LOW);
+#endif
+}
 
 static void run_led(uint32_t now) {
     if (hw_stop || soft_stop)
@@ -618,13 +635,14 @@ void setup() {
     digitalWrite(MISTER_PIN, LOW);
     ledcAttach(BLOWER_PIN, BLOWER_PWM_HZ, BLOWER_PWM_BITS);
     ledcWrite(BLOWER_PIN, 0);
-    pinMode(LED_PIN, OUTPUT);
+    if (!LED_RGB)
+        pinMode(LED_PIN, OUTPUT);
     led(false);
     pinMode(STOP_PIN, INPUT_PULLUP);
     pinMode(BUTTON_PIN, INPUT_PULLUP);
 
     Serial.begin(115200);
-    Serial.println("fog_controller starting");
+    Serial.println("fog_mister starting");
     load_settings();
 
     Serial1.setTxBufferSize(256);

@@ -4,15 +4,16 @@ Firmware for the **fogbox**: a chilled low-fog box hidden along a wooded path
 that lays a 10–20 m layer of ground fog for each group of walkers, timed to
 start about 90 seconds before they arrive.
 
-A trigger node 100–200 m upstream tells the controller a group is coming. The
-controller then runs a fog machine, an ultrasonic mister and a blower on a
+Two boards: the **mister** box at the fog stretch and a **trigger** node
+100–200 m upstream. The trigger tells the mister box a group is coming; the
+mister box then runs a fog machine, an ultrasonic mister and a blower on a
 timed cycle; the cold fog leaves the box at floor level into a perforated pipe
 along the path edge.
 
 ```
-  trigger node  ──ESP-NOW──►  controller ──DMX──► fog machine ─┐
-  (button / PIR)              (ESP32-C3)  ──SSR──► mister     ├─► chiller box ─► manifold pipe
-                                          ──PWM──► blower    ─┘
+  trigger node  ──ESP-NOW──►  mister box ──DMX──► fog machine       ─┐
+  (button / PIR)              (ESP32-S3)  ──SSR──► ultrasonic mister ├─► chiller box ─► manifold pipe
+                                          ──PWM──► blower            ─┘
                                  ▲
                          phone: Wi-Fi "fogbox", http://192.168.4.1
 ```
@@ -21,12 +22,13 @@ along the path edge.
 
 | Path | What it is |
 | --- | --- |
-| [`fog_controller/`](fog_controller/main.cpp) | Controller sketch: fog machine, mister, blower, web UI, cycle timing |
+| [`fog_mister/`](fog_mister/main.cpp) | Mister box sketch: fog machine, ultrasonic mister, blower, web UI, cycle timing |
 | [`fog_trigger/`](fog_trigger/main.cpp) | Trigger node sketch: button / PIR → ESP-NOW "group coming" |
-| [`docs/fog_controller.svg`](docs/fog_controller.svg) | Controller wiring schematic |
+| [`docs/fog_mister.svg`](docs/fog_mister.svg) | Mister box wiring schematic |
 | [`docs/fog_trigger.svg`](docs/fog_trigger.svg) | Trigger node wiring schematic |
 | [`docs/gen_schematics.py`](docs/gen_schematics.py) | Generates both schematics |
-| [`build.sh`](build.sh) | `arduino-cli` wrapper: build, upload, monitor |
+| [`fog.py`](fog.py) | Build, flash and monitor the boards, found by MAC |
+| [`boards.toml`](boards.toml) | The physical boards: MAC, chip, role |
 
 The code of each sketch lives in its `main.cpp`; the `.ino` file is an empty
 stub so the Arduino IDE doesn't generate prototypes.
@@ -36,10 +38,11 @@ The earlier AT-style BLE config firmware is kept on the
 
 ## Hardware
 
-Both boards are ESP32-C3 dev boards. A board with an external antenna
-connector helps radio range.
+Both boards are ESP32-S3 SuperMini boards (the sketches also build for an
+ESP32-C3 SuperMini). A board with an external antenna connector helps radio
+range.
 
-**Controller box**
+**Mister box**
 
 - BeamZ BLAZE1200 fog machine, driven over DMX through a MAX3485 (3.3 V)
   RS-485 module and a cut 3-pin XLR cable
@@ -52,26 +55,26 @@ connector helps radio range.
 
 **Trigger node**
 
-- ESP32-C3 on a USB power bank (one that doesn't auto-switch-off at ~80 mA)
+- ESP32-S3 SuperMini on a USB power bank (one that doesn't auto-switch-off at ~80 mA)
 - Push button, optional AM312 PIR sensor
 
 ### Wiring
 
-![Controller schematic](docs/fog_controller.svg)
+![Mister box schematic](docs/fog_mister.svg)
 
-| Controller pin | Goes to | Note |
+| Mister box pin | Goes to | Note |
 | --- | --- | --- |
 | GPIO3 | MAX3485 DI | DMX out; DE and /RE to 3V3 |
 | GPIO4 | MOSFET #1 TRIG | Blower PWM, 20 kHz; 10 kΩ TRIG → GND |
-| GPIO5 | MOSFET #2 TRIG | Mister via SSR; 10 kΩ TRIG → GND |
+| GPIO5 | MOSFET #2 TRIG | Ultrasonic mister via SSR; 10 kΩ TRIG → GND |
 | GPIO7 | STOP toggle → GND | Closed = everything off |
 | GPIO10 | Push button → GND | Short = group coming, hold 2 s = undo |
-| GPIO8 | On-board LED | Active low (SuperMini) |
+| GPIO48 | On-board RGB LED | WS2812 on the S3 SuperMini, shown blue (C3 build: GPIO8, active low) |
 | 5V / GND | Buck converter | Buck input from the 12 V supply |
 
 The SSR input is driven with a full 12 V (SSR + to +12 V, SSR − to MOSFET #2
-OUT−), since 3.3 V is below its 4 V minimum. The mister's DC side is isolated
-behind the SSR and never shares the 12 V ground. Check that the mister brick's
+OUT−), since 3.3 V is below its 4 V minimum. The ultrasonic mister's DC side is
+isolated behind the SSR and never shares the 12 V ground. Check that the mister brick's
 output is DC before using the DC-switching SSR-40DD.
 
 ![Trigger node schematic](docs/fog_trigger.svg)
@@ -80,31 +83,48 @@ output is DC before using the DC-switching SSR-40DD.
 | --- | --- | --- |
 | GPIO3 | Push button → GND | Short = group coming, hold 2 s = undo |
 | GPIO4 | PIR output | Optional, set `USE_SENSOR` to `true` |
-| GPIO8 | On-board LED | Active low (SuperMini) |
+| GPIO48 | On-board RGB LED | WS2812 on the S3 SuperMini, shown blue (C3 build: GPIO8, active low) |
 | USB | Power bank | About 80 mA |
 
 ## Building and flashing
 
 Requires the Espressif Arduino core 3.3.x.
 
-**arduino-cli**
+**fog.py** (Python 3.11+, `pyserial`, `arduino-cli`)
+
+Boards are listed in [`boards.toml`](boards.toml) by MAC, chip and role
+(`MISTER` builds `fog_mister/`, `TRIGGER` builds `fog_trigger/`). `fog.py`
+finds each board's serial port by its MAC (native-USB ESP32 boards report it as
+the USB serial number), so it doesn't matter which `/dev/ttyACM*` is which.
 
 ```sh
-./build.sh update                          # install the ESP32 core (once)
-./build.sh build                           # build both into dist/<sketch>/
-MODULE=fog_controller ./build.sh deploy    # build, upload, serial monitor
-MODULE=fog_trigger DEV_PORT=/dev/ttyACM1 ./build.sh deploy
+python3 fog.py update                    # install the ESP32 core (once)
+python3 fog.py list                      # plugged-in boards and which entry they are
+python3 fog.py identify /dev/ttyACM2     # MAC + chip of a new board, for boards.toml
+python3 fog.py build all                 # build into dist/<chip>/<sketch>/
+python3 fog.py deploy mister trigger --monitor   # build, flash, serial output
+python3 fog.py monitor all               # serial output of both, prefixed with the name
 ```
 
-`build.sh` keeps its Arduino data in `./.arduino15`; set
-`ARDUINO_DIRECTORIES_DATA` to use an existing install instead. Run
-`./build.sh help` for all options.
+If flashing fails with a timeout or `Protocol error` (a board stuck in a reset
+loop, or a flaky USB link), hold **BOOT**, press **RESET**, release BOOT, and
+flash with `--no-reset`: `python3 fog.py flash mister --no-reset`.
+
+A board name, a role (any case) or `all` selects boards; a role with a spare
+flashes whichever of them is plugged in. The trigger is built with the mister
+box's MAC, so rebuild it after replacing the mister board. Flashing writes the
+bootloader, partition table (`no_ota`), `boot_app0` and app, never the NVS
+partition, so the mister box keeps its settings. `DEBUG=1` adds `-DDEBUG`,
+`--flags` / `EXTRA_FLAGS` add compiler flags, and `ARDUINO_DIRECTORIES_DATA`
+picks the Arduino data directory (default `./.arduino15` if present, else
+arduino-cli's own).
 
 **Arduino IDE 2**
 
 1. Boards Manager → install "esp32 by Espressif Systems" 3.x.
-2. Board: "ESP32C3 Dev Module", Tools → USB CDC On Boot: Enabled.
-3. Open the `fog_controller` folder and upload; repeat for `fog_trigger` on
+2. Board: "ESP32S3 Dev Module", Tools → USB CDC On Boot: Enabled,
+   Partition Scheme: No OTA.
+3. Open the `fog_mister` folder and upload; repeat for `fog_trigger` on
    the second board.
 
 ### Compile-time options
@@ -116,13 +136,13 @@ MODULE=fog_trigger DEV_PORT=/dev/ttyACM1 ./build.sh deploy
 | both | `LED_ACTIVE_LOW` | `1` | Set to `0` for an active-high LED |
 | trigger | `USE_SENSOR` | `false` | Use the PIR on GPIO4 |
 | trigger | `PIR_LOCKOUT_MS` | `45000` | One group per PIR trigger |
-| controller | `AP_SSID` / `AP_PASS` | `fogbox` / `boo-fog-2026` | Web UI access point |
+| mister | `AP_SSID` / `AP_PASS` | `fogbox` / `boo-fog-2026` | Web UI access point |
 
 ## Using it
 
 Join Wi-Fi **fogbox** (password `boo-fog-2026`) and open
 **http://192.168.4.1**. The page shows the phase, queued groups, next arrival,
-fog / mister / blower state, warm-up countdown, fallback status, the trigger
+fog / ultrasonic mister / blower state, warm-up countdown, fallback status, the trigger
 node's signal strength and run time totals.
 
 Buttons: *Group coming*, *Undo last group*, *Clear all groups*, *Fog burst
@@ -135,7 +155,7 @@ Every trigger means "a group reaches the fog in *walk time* seconds". Groups
 are queued, so overlapping cycles just work; the busiest phase of all queued
 groups wins.
 
-| Phase | Starts | Fog machine | Mister | Blower |
+| Phase | Starts | Fog machine | Ultrasonic mister | Blower |
 | --- | --- | --- | --- | --- |
 | Build-up | 90 s before arrival | 8 s burst, then 5 s every 20 s | on | 45 % |
 | Hold | at arrival, 90 s | 5 s every 30 s | on | 35 % |
@@ -148,13 +168,13 @@ no fog during the first 4 minutes after power-on (warm-up), the blower ramps up
 at 40 % per second, and STOP (switch or web) cuts everything at once.
 
 **Fallback:** if no trigger arrives within the fallback interval (390 s) after
-the last one, the controller starts a cycle itself. After 3 fallback cycles in
+the last one, the mister starts a cycle itself. After 3 fallback cycles in
 a row without a real trigger it stops, so it won't fog an empty wood after
 the last group. *End show* disarms it straight away.
 
 ### Settings
 
-Stored in NVS on the controller, editable on the web page, kept across
+Stored in NVS on the mister, editable on the web page, kept across
 power-off.
 
 | Setting | Default | Set it to |
@@ -163,7 +183,7 @@ power-off.
 | Fallback interval | 390 s | Group interval + 30 s (0 = off) |
 | Build-up / hold / tail / purge | 90 / 90 / 30 / 60 s | Lengthen build-up if the layer isn't there in time |
 | Blower % per phase | 45 / 35 / 30 / 15 | Lowest that still pushes fog to the pipe ends |
-| Fog machine enabled | 1 | 0 for mister-only mode before dusk |
+| Fog machine enabled | 1 | 0 for ultrasonic-mister-only mode before dusk |
 
 On the fog machine: DMX mode, start address 1 (channel 1 = fog).
 
@@ -171,30 +191,33 @@ On the fog machine: DMX mode, start address 1 (channel 1 = fog).
 
 | Board | Pattern | Meaning |
 | --- | --- | --- |
-| Controller | short blip every 2 s | idle |
-| Controller | fast blink | cycle running |
-| Controller | solid | stopped |
-| Trigger | short blip every 2 s | link to controller OK |
+| Mister box | short blip every 2 s | idle |
+| Mister box | fast blink | cycle running |
+| Mister box | solid | stopped |
+| Trigger | short blip every 2 s | link to mister OK |
 | Trigger | blinking twice a second | no link |
 | Trigger | flicker | sending |
-| Trigger | on for 1.5 s | controller confirmed |
+| Trigger | on for 1.5 s | mister confirmed |
 | Trigger | three long flashes | not confirmed |
 
 ## Radio protocol
 
-The controller runs the `fogbox` access point on channel 1 and listens for
+The mister runs the `fogbox` access point on channel 1 and listens for
 ESP-NOW on the same radio. The trigger node stays in station mode on channel 1
 without joining the network.
 
 Messages are a 6-byte packed struct: magic `0x464F4731` ("FOG1"), a type and a
-sequence number. Types: `PING` (1), `GROUP` (2), `UNDO` (3); the controller
+sequence number. Types: `PING` (1), `GROUP` (2), `UNDO` (3); the mister
 answers each with the same type OR'ed with `ACK` (0x80) and the same sequence
 number.
 
 - The trigger pings every 2 s; the link is OK while acks keep arriving.
-- It broadcasts until the first ack, then unicasts to the controller's MAC.
+- Built by `fog.py`, the trigger knows the mister box's MAC from `boards.toml`
+  (`-DMISTER_MAC`, the soft-AP MAC = base MAC + 1) and unicasts from boot,
+  ignoring acks from any other board. Built without it, it broadcasts until
+  the first ack, then unicasts to that board.
 - `GROUP` and `UNDO` are resent every 250 ms, up to 8 times, until acked.
-- The controller acts on each `GROUP` / `UNDO` sequence number once, so
+- The mister acts on each `GROUP` / `UNDO` sequence number once, so
   retries never queue a group twice.
 
 ## Test day

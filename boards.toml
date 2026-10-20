@@ -1,0 +1,34 @@
+# Fogbox boards, used by fog.py.
+#
+# One table per physical board. fog.py finds the board's serial port by
+# its MAC: native-USB ESP32-C3/S3 boards report the MAC as their USB serial
+# number, so no reset or esptool call is needed for that.
+#   mac  = MAC as esptool prints it ("python3 fog.py identify <port>")
+#   chip = esp32c3 | esp32s3 (selects the arduino-cli FQBN and esptool --chip)
+#   role = MISTER | TRIGGER (selects the sketch: fog_mister/ or fog_trigger/)
+# A role can have several boards (spares). Selecting the role ("deploy trigger") means all of
+# them: the ones that are plugged in are flashed, the others skipped.
+# The TRIGGER firmware is built with the MAC of the MISTER board below (-DMISTER_MAC),
+# so it unicasts to that mister from boot. With no mister mac yet it finds the
+# mister by broadcast instead. Rebuild the triggers after changing the mister.
+#
+# Fill in the macs: plug a board in and run "python3 fog.py list" or
+# "python3 fog.py identify <port>".
+
+[boards.mister]
+mac  = "9C:13:9E:F0:50:60"
+chip = "esp32s3"           # ESP32-S3 SuperMini in the fogbox (pins: see fog_mister/main.cpp)
+role = "MISTER"
+
+[boards.trigger]
+mac  = "9C:13:9E:F0:50:78"
+chip = "esp32s3"           # ESP32-S3 SuperMini on the power bank, 100-200 m upstream
+role = "TRIGGER"
+
+# A spare trigger (identical, same firmware). With two boards of a role, "python3 fog.py deploy trigger"
+# builds once and flashes whichever of them is plugged in (and says which it skipped); name one
+# ("deploy trigger_spare") to require that board. Remove the # signs and fill in its mac:
+#[boards.trigger_spare]
+#mac  = ""
+#chip = "esp32s3"
+#role = "TRIGGER"

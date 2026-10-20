@@ -1,14 +1,14 @@
 /*
  * fog_trigger - sits 100-200 m upstream of the fog stretch and tells the
- * fog_controller over ESP-NOW that a group is coming. A marshal presses the
+ * fog_mister over ESP-NOW that a group is coming. A marshal presses the
  * button, or an optional PIR sensor does it.
  *
  * Button: short press = group coming, hold 2 s = undo last group.
  * LED: short blip every 2 s = link OK, blinking twice a second = no link,
- * flicker = sending, on for 1.5 s = controller confirmed, three long
+ * flicker = sending, on for 1.5 s = mister confirmed, three long
  * flashes = not confirmed.
  *
- * Board: ESP32-C3, Espressif Arduino core 3.3.x, USB CDC On Boot enabled.
+ * Board: ESP32-S3 or ESP32-C3 SuperMini, Espressif Arduino core 3.3.x, USB CDC On Boot enabled.
  */
 
 #include <Arduino.h>
@@ -19,21 +19,31 @@
 /* ---- pins ---- */
 #define BUTTON_PIN      3   // push button to GND
 #define PIR_PIN         4   // AM312 output, powered from 3V3
-#define LED_PIN         8   // on-board LED (SuperMini: blue, active low)
-#define LED_ACTIVE_LOW  1
+#if CONFIG_IDF_TARGET_ESP32S3
+#define LED_PIN         48  // on-board LED (S3 SuperMini: WS2812 RGB, shown blue)
+#define LED_RGB         1
+#define LED_RGB_LEVEL   40  // 0-255, it is bright
+#else
+#define LED_PIN         8   // on-board LED (C3 SuperMini: blue, active low)
+#define LED_RGB         0
+#endif
+#define LED_ACTIVE_LOW  1   // plain LED only
 
 /* ---- options ---- */
 #define USE_SENSOR      false
 #define PIR_LOCKOUT_MS  45000   // one group per PIR trigger
-#define ESPNOW_CHANNEL  1       // must match the controller's AP channel
+#define ESPNOW_CHANNEL  1       // must match the mister's AP channel
 #define TX_POWER        WIFI_POWER_19_5dBm  // SuperMini boards: try WIFI_POWER_8_5dBm
 #define PING_EVERY_MS   2000
 #define LINK_TIMEOUT_MS 6500
 #define RETRY_MS        250
 #define RETRIES         8
 #define LONG_PRESS_MS   2000
+/* MISTER_MAC: the mister's soft-AP MAC as bytes, set by fog.py from boards.toml
+ * (-DMISTER_MAC=0x..,0x..,...). Without it the trigger finds the mister by
+ * broadcast and takes the first one that acks. */
 
-/* ---- ESP-NOW protocol, keep in sync with fog_controller ---- */
+/* ---- ESP-NOW protocol, keep in sync with fog_mister ---- */
 #define FOG_MAGIC 0x464F4731UL  // "FOG1"
 enum : uint8_t { MSG_PING = 1, MSG_GROUP = 2, MSG_UNDO = 3, MSG_ACK = 0x80 };
 struct __attribute__((packed)) FogMsg {
@@ -43,8 +53,13 @@ struct __attribute__((packed)) FogMsg {
 };
 
 static const uint8_t BROADCAST[6] = {0xff, 0xff, 0xff, 0xff, 0xff, 0xff};
-static uint8_t controller[6];
-static bool have_controller = false;
+#ifdef MISTER_MAC
+static uint8_t mister[6] = {MISTER_MAC};
+static bool have_mister = true;
+#else
+static uint8_t mister[6];
+static bool have_mister = false;
+#endif
 
 static volatile uint32_t last_ack_ms = 0;
 static volatile bool got_ack = false;
@@ -66,7 +81,17 @@ static uint32_t led_mode_since = 0;
 
 static inline bool elapsed(uint32_t now, uint32_t t) { return (int32_t)(now - t) >= 0; }
 
-static void led(bool on) { digitalWrite(LED_PIN, (on ^ LED_ACTIVE_LOW) ? HIGH : LOW); }
+static void led(bool on) {
+#if LED_RGB
+    static int last = -1;  // the WS2812 takes an RMT write; only send changes
+    if (on == last)
+        return;
+    last = on;
+    rgbLedWrite(LED_PIN, 0, 0, on ? LED_RGB_LEVEL : 0);
+#else
+    digitalWrite(LED_PIN, (on ^ LED_ACTIVE_LOW) ? HIGH : LOW);
+#endif
+}
 
 static void on_recv(const esp_now_recv_info_t *info, const uint8_t *data, int len) {
     if (len != sizeof(FogMsg))
@@ -75,6 +100,10 @@ static void on_recv(const esp_now_recv_info_t *info, const uint8_t *data, int le
     memcpy(&m, data, sizeof m);
     if (m.magic != FOG_MAGIC || !(m.type & MSG_ACK))
         return;
+#ifdef MISTER_MAC
+    if (memcmp(info->src_addr, mister, 6) != 0)
+        return;
+#endif
     for (int i = 0; i < 6; i++)
         ack_mac[i] = info->src_addr[i];
     ack_type = m.type & ~MSG_ACK;
@@ -96,8 +125,8 @@ static void add_peer(const uint8_t *mac) {
 
 static void send_msg(uint8_t type, uint8_t s) {
     FogMsg m = {FOG_MAGIC, type, s};
-    // unicast once the controller is known: the radio then retries by itself
-    esp_now_send(have_controller ? controller : BROADCAST, (const uint8_t *)&m, sizeof m);
+    // unicast once the mister is known: the radio then retries by itself
+    esp_now_send(have_mister ? mister : BROADCAST, (const uint8_t *)&m, sizeof m);
 }
 
 static void queue_send(uint8_t type, uint32_t now) {
@@ -113,12 +142,12 @@ static void handle_acks(uint32_t now) {
     if (!got_ack)
         return;
     got_ack = false;
-    if (!have_controller) {
-        memcpy(controller, (const void *)ack_mac, 6);
-        add_peer(controller);
-        have_controller = true;
-        Serial.printf("controller %02x:%02x:%02x:%02x:%02x:%02x\n", controller[0], controller[1],
-                      controller[2], controller[3], controller[4], controller[5]);
+    if (!have_mister) {
+        memcpy(mister, (const void *)ack_mac, 6);
+        add_peer(mister);
+        have_mister = true;
+        Serial.printf("mister %02x:%02x:%02x:%02x:%02x:%02x\n", mister[0], mister[1],
+                      mister[2], mister[3], mister[4], mister[5]);
     }
     if (sending && ack_type == send_type && ack_seq == send_seq) {
         sending = false;
@@ -162,7 +191,7 @@ static void run_led(uint32_t now) {
     }
     if (sending)
         led((now / 40) % 2);
-    else if (have_controller && now - last_ack_ms < LINK_TIMEOUT_MS)
+    else if (have_mister && now - last_ack_ms < LINK_TIMEOUT_MS)
         led(now % 2000 < 40);
     else
         led(now % 500 < 250);
@@ -195,7 +224,8 @@ struct Button {
 static Button button{BUTTON_PIN};
 
 void setup() {
-    pinMode(LED_PIN, OUTPUT);
+    if (!LED_RGB)
+        pinMode(LED_PIN, OUTPUT);
     led(false);
     pinMode(BUTTON_PIN, INPUT_PULLUP);
     if (USE_SENSOR)
@@ -212,7 +242,8 @@ void setup() {
     if (esp_now_init() != ESP_OK)
         Serial.println("ESP-NOW init failed");
     esp_now_register_recv_cb(on_recv);
-    add_peer(BROADCAST);
+    add_peer(have_mister ? mister : BROADCAST);
+    Serial.printf("mister %s\n", have_mister ? "from build" : "by broadcast");
     cmd_seq = esp_random();
 }
 

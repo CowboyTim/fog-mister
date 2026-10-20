@@ -28,12 +28,12 @@ text{font-family:Helvetica,Arial,sans-serif;fill:#1d1d1f}
 <text x="115.0" y="82" class="t" text-anchor="middle">USB power bank</text>
 <text x="115.0" y="99" class="s" text-anchor="middle">no auto-off at ~80 mA</text>
 <rect x="320" y="60" width="220" height="330" rx="6" class="mcu"/>
-<text x="430.0" y="82" class="t" text-anchor="middle">ESP32-C3</text>
-<text x="430.0" y="99" class="s" text-anchor="middle">trigger node</text>
+<text x="430.0" y="82" class="t" text-anchor="middle">ESP32-S3</text>
+<text x="430.0" y="99" class="s" text-anchor="middle">SuperMini</text>
 <text x="430" y="130" class="s" text-anchor="middle">Wi-Fi STA on ch 1, not joined</text>
-<text x="430" y="146" class="s" text-anchor="middle">ESP-NOW → controller</text>
+<text x="430" y="146" class="s" text-anchor="middle">ESP-NOW → mister</text>
 <text x="430" y="162" class="s" text-anchor="middle">100–200 m in woods</text>
-<text x="430" y="190" class="s" text-anchor="middle">GPIO8: on-board LED</text>
+<text x="430" y="190" class="s" text-anchor="middle">GPIO48: on-board RGB LED</text>
 <text x="430" y="206" class="s" text-anchor="middle">blip = link OK, 2 Hz = no link</text>
 <text x="430" y="222" class="s" text-anchor="middle">on 1.5 s = confirmed</text>
 <text x="430" y="238" class="s" text-anchor="middle">3 long flashes = not confirmed</text>

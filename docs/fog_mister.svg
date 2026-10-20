@@ -22,7 +22,7 @@ text{font-family:Helvetica,Arial,sans-serif;fill:#1d1d1f}
 .cable{fill:none;stroke:#7b3fbf;stroke-width:1;stroke-dasharray:4 3}
 </style>
 <rect width="1400" height="1010" fill="#fff"/>
-<text x="24" y="36" class="h" text-anchor="start">Fogbox controller (fog_controller)</text>
+<text x="24" y="36" class="h" text-anchor="start">Fogbox: mister box (fog_mister)</text>
 <g transform="translate(0,40)">
 <rect x="40" y="40" width="160" height="60" rx="6" class="dev"/>
 <text x="120.0" y="62" class="t" text-anchor="middle">Fossibot F2400</text>
@@ -64,12 +64,13 @@ text{font-family:Helvetica,Arial,sans-serif;fill:#1d1d1f}
 <text x="253" y="339" class="p" text-anchor="end">5V out</text>
 <polyline points="260,335 295,335 295,305 330,305" class="w v5"/>
 <rect x="330" y="270" width="220" height="460" rx="6" class="mcu"/>
-<text x="440.0" y="292" class="t" text-anchor="middle">ESP32-C3</text>
-<text x="440.0" y="309" class="s" text-anchor="middle">controller</text>
+<text x="440.0" y="292" class="t" text-anchor="middle">ESP32-S3</text>
+<text x="440.0" y="309" class="s" text-anchor="middle">SuperMini</text>
+<text x="440.0" y="324" class="s" text-anchor="middle">fog_mister</text>
 <text x="440" y="440" class="s" text-anchor="middle">Wi-Fi AP “fogbox”, ch 1</text>
 <text x="440" y="456" class="s" text-anchor="middle">ESP-NOW ← trigger node</text>
 <text x="440" y="472" class="s" text-anchor="middle">web UI 192.168.4.1</text>
-<text x="440" y="500" class="s" text-anchor="middle">GPIO8: on-board LED</text>
+<text x="440" y="500" class="s" text-anchor="middle">GPIO48: on-board RGB LED</text>
 <circle cx="330" cy="305" r="2.8" fill="#fff" stroke="#333" stroke-width="1.3"/>
 <text x="337" y="309" class="p" text-anchor="start">5V</text>
 <circle cx="330" cy="360" r="2.8" fill="#fff" stroke="#333" stroke-width="1.3"/>
@@ -260,11 +261,11 @@ text{font-family:Helvetica,Arial,sans-serif;fill:#1d1d1f}
 <polyline points="300,940 334,940" class="w dmx"/>
 <text x="344" y="944" class="p" text-anchor="start">DMX / RS-485</text>
 <polyline points="300,960 334,960" class="w iso"/>
-<text x="344" y="964" class="p" text-anchor="start">isolated mister DC</text>
+<text x="344" y="964" class="p" text-anchor="start">isolated ultrasonic mister DC</text>
 <polyline points="300,980 334,980" class="w gnd"/>
 <text x="344" y="984" class="p" text-anchor="start">ground</text>
 <text x="560" y="924" class="p" text-anchor="start">All ground symbols are one common ground: 12 V supply −, buck, ESP32, MOSFET VIN−, MAX3485.</text>
-<text x="560" y="944" class="p" text-anchor="start">+12V flags all connect to the 12 V supply's + output. The mister's DC side stays isolated behind the SSR.</text>
+<text x="560" y="944" class="p" text-anchor="start">+12V flags all connect to the 12 V supply's + output. The ultrasonic mister's DC side stays isolated behind the SSR.</text>
 <text x="560" y="964" class="p" text-anchor="start">10 kΩ pull-downs keep the MOSFETs off while the ESP32 boots. Diode band (cathode) to blower +.</text>
 <text x="560" y="984" class="p" text-anchor="start">Fog machine stand: horizontal, 50 cm clear around vents, 5 cm gap from nozzle to the duct.</text>
 </svg>

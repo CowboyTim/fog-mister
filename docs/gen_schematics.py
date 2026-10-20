@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Generates fog_controller.svg and fog_trigger.svg.
+"""Generates fog_mister.svg and fog_trigger.svg.
 
 Usage: python3 docs/gen_schematics.py docs
 """
@@ -123,8 +123,8 @@ class Svg:
             f.write(STYLE + "\n" + "\n".join(s.o) + "\n</svg>\n")
 
 
-def controller(path):
-    s = Svg(1400, 1010, "Fogbox controller (fog_controller)")
+def mister(path):
+    s = Svg(1400, 1010, "Fogbox: mister box (fog_mister)")
     s.add('<g transform="translate(0,40)">')
 
     # mains
@@ -155,12 +155,12 @@ def controller(path):
     s.pin(260, 335, "5V out", "r")
     s.wire([(260, 335), (295, 335), (295, 305), (330, 305)], "v5")
 
-    # ESP32-C3
-    s.box(330, 270, 220, 460, "ESP32-C3", ["controller"], "mcu")
+    # ESP32-S3 SuperMini
+    s.box(330, 270, 220, 460, "ESP32-S3", ["SuperMini", "fog_mister"], "mcu")
     s.text(440, 440, "Wi-Fi AP “fogbox”, ch 1", "s", "middle")
     s.text(440, 456, "ESP-NOW ← trigger node", "s", "middle")
     s.text(440, 472, "web UI 192.168.4.1", "s", "middle")
-    s.text(440, 500, "GPIO8: on-board LED", "s", "middle")
+    s.text(440, 500, "GPIO48: on-board RGB LED", "s", "middle")
     s.pin(330, 305, "5V", "l")
     s.pin(330, 360, "GND", "l")
     s.wire([(330, 360), (300, 360)], "gnd")
@@ -275,9 +275,9 @@ def controller(path):
 
     s.add("</g>")
     s.legend(40, 920, [("mains", "230 V AC"), ("v12", "+12 V"), ("v5", "+5 V"), ("v33", "+3.3 V")])
-    s.legend(300, 920, [("sig", "logic signal"), ("dmx", "DMX / RS-485"), ("iso", "isolated mister DC"), ("gnd", "ground")])
+    s.legend(300, 920, [("sig", "logic signal"), ("dmx", "DMX / RS-485"), ("iso", "isolated ultrasonic mister DC"), ("gnd", "ground")])
     s.text(560, 924, "All ground symbols are one common ground: 12 V supply −, buck, ESP32, MOSFET VIN−, MAX3485.", "p")
-    s.text(560, 944, "+12V flags all connect to the 12 V supply's + output. The mister's DC side stays isolated behind the SSR.", "p")
+    s.text(560, 944, "+12V flags all connect to the 12 V supply's + output. The ultrasonic mister's DC side stays isolated behind the SSR.", "p")
     s.text(560, 964, "10 kΩ pull-downs keep the MOSFETs off while the ESP32 boots. Diode band (cathode) to blower +.", "p")
     s.text(560, 984, "Fog machine stand: horizontal, 50 cm clear around vents, 5 cm gap from nozzle to the duct.", "p")
     s.save(path)
@@ -287,11 +287,11 @@ def trigger(path):
     s = Svg(920, 540, "Fogbox trigger node (fog_trigger)")
     s.add('<g transform="translate(0,30)">')
     s.box(40, 60, 150, 80, "USB power bank", ["no auto-off at ~80 mA"], "dev")
-    s.box(320, 60, 220, 330, "ESP32-C3", ["trigger node"], "mcu")
+    s.box(320, 60, 220, 330, "ESP32-S3", ["SuperMini"], "mcu")
     s.text(430, 130, "Wi-Fi STA on ch 1, not joined", "s", "middle")
-    s.text(430, 146, "ESP-NOW → controller", "s", "middle")
+    s.text(430, 146, "ESP-NOW → mister", "s", "middle")
     s.text(430, 162, "100–200 m in woods", "s", "middle")
-    s.text(430, 190, "GPIO8: on-board LED", "s", "middle")
+    s.text(430, 190, "GPIO48: on-board RGB LED", "s", "middle")
     s.text(430, 206, "blip = link OK, 2 Hz = no link", "s", "middle")
     s.text(430, 222, "on 1.5 s = confirmed", "s", "middle")
     s.text(430, 238, "3 long flashes = not confirmed", "s", "middle")
@@ -329,5 +329,5 @@ def trigger(path):
 
 
 out = sys.argv[1]
-controller(f"{out}/fog_controller.svg")
+mister(f"{out}/fog_mister.svg")
 trigger(f"{out}/fog_trigger.svg")
