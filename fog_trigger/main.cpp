@@ -47,7 +47,7 @@
 #define RETRY_MS        250
 #define RETRIES         8
 #define LONG_PRESS_MS   2000
-/* MISTER_MAC: the mister's soft-AP MAC as bytes, set by fog.py from boards.toml
+/* MISTER_MAC: the mister's soft-AP MAC as bytes, set by deploy.py from boards.toml
  * (-DMISTER_MAC=0x..,0x..,...). Without it the trigger finds the mister by
  * broadcast and takes the first one that acks. */
 

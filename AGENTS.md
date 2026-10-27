@@ -15,7 +15,7 @@ Guidance for coding agents working in this repository. See
   `main.cpp` so the Arduino IDE doesn't generate prototypes.
 - `docs/gen_schematics.py` – generates `docs/fog_mister.svg` and
   `docs/fog_trigger.svg`. Never hand-edit the SVGs.
-- `fog.py` – build / flash / monitor tool; `boards.toml` lists the physical
+- `deploy.py` – build / flash / monitor tool; `boards.toml` lists the physical
   boards (MAC, chip, role `MISTER` or `TRIGGER`). Each role keeps its own
   sketch directory.
 - Branch `esp-at-ble-config` holds the old AT-style BLE config firmware; it
@@ -27,18 +27,18 @@ There is no test suite and no hardware in CI. The minimum check for any
 firmware change is a clean compile of both sketches:
 
 ```sh
-python3 fog.py build all
+python3 deploy.py build all
 ```
 
-`fog.py` uses `$ARDUINO_DIRECTORIES_DATA`, else `./.arduino15` if it exists,
+`deploy.py` uses `$ARDUINO_DIRECTORIES_DATA`, else `./.arduino15` if it exists,
 else arduino-cli's default. If the ESP32 core is installed elsewhere, point at
 it:
 
 ```sh
-ARDUINO_DIRECTORIES_DATA=$HOME/.arduino15 python3 fog.py build all
+ARDUINO_DIRECTORIES_DATA=$HOME/.arduino15 python3 deploy.py build all
 ```
 
-Don't flash boards unless asked: `fog.py flash/deploy` writes to whatever
+Don't flash boards unless asked: `deploy.py flash/deploy` writes to whatever
 board in `boards.toml` is plugged in.
 
 Target: Espressif Arduino core 3.3.x, chip from `boards.toml` (`esp32s3` now,
@@ -60,7 +60,7 @@ python3 docs/gen_schematics.py docs
   duplicated in both sketches. Change both together; bump `FOG_MAGIC` if the
   format changes incompatibly.
 - **`ESPNOW_CHANNEL`** must be equal on both boards and match the
-  mister box's AP channel. `fog.py` passes the trigger the mister box's
+  mister box's AP channel. `deploy.py` passes the trigger the mister box's
   soft-AP MAC as `-DMISTER_MAC`, derived per chip in `ap_mac()` (S3: locally
   administered bit set, C3: base + 1). The mister prints its AP MAC at boot.
 - **Pin assignments:** a pin change touches the `#define`s in `main.cpp`, the

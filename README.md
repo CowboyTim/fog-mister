@@ -27,7 +27,7 @@ along the path edge.
 | [`docs/fog_mister.svg`](docs/fog_mister.svg) | Mister box wiring schematic |
 | [`docs/fog_trigger.svg`](docs/fog_trigger.svg) | Trigger node wiring schematic |
 | [`docs/gen_schematics.py`](docs/gen_schematics.py) | Generates both schematics |
-| [`fog.py`](fog.py) | Build, flash and monitor the boards, found by MAC |
+| [`deploy.py`](deploy.py) | Build, flash and monitor the boards, found by MAC |
 | [`boards.toml`](boards.toml) | The physical boards: MAC, chip, role |
 
 The code of each sketch lives in its `main.cpp`; the `.ino` file is an empty
@@ -91,25 +91,25 @@ output is DC before using the DC-switching SSR-40DD.
 
 Requires the Espressif Arduino core 3.3.x.
 
-**fog.py** (Python 3.11+, `pyserial`, `arduino-cli`)
+**deploy.py** (Python 3.11+, `pyserial`, `arduino-cli`)
 
 Boards are listed in [`boards.toml`](boards.toml) by MAC, chip and role
-(`MISTER` builds `fog_mister/`, `TRIGGER` builds `fog_trigger/`). `fog.py`
+(`MISTER` builds `fog_mister/`, `TRIGGER` builds `fog_trigger/`). `deploy.py`
 finds each board's serial port by its MAC (native-USB ESP32 boards report it as
 the USB serial number), so it doesn't matter which `/dev/ttyACM*` is which.
 
 ```sh
-python3 fog.py update                    # install the ESP32 core (once)
-python3 fog.py list                      # plugged-in boards and which entry they are
-python3 fog.py identify /dev/ttyACM2     # MAC + chip of a new board, for boards.toml
-python3 fog.py build all                 # build into dist/<chip>/<sketch>/
-python3 fog.py deploy mister trigger --monitor   # build, flash, serial output
-python3 fog.py monitor all               # serial output of both, prefixed with the name
+python3 deploy.py update                           # install the ESP32 core (once)
+python3 deploy.py list                             # plugged-in boards and which entry they are
+python3 deploy.py identify /dev/ttyACM2            # MAC + chip of a new board, for boards.toml
+python3 deploy.py build all                        # build into dist/<chip>/<sketch>/
+python3 deploy.py deploy mister trigger --monitor  # build, flash, serial output
+python3 deploy.py monitor all                      # serial output of both, prefixed with the name
 ```
 
 If flashing fails with a timeout or `Protocol error` (a board stuck in a reset
 loop, or a flaky USB link), hold **BOOT**, press **RESET**, release BOOT, and
-flash with `--no-reset`: `python3 fog.py flash mister --no-reset`.
+flash with `--no-reset`: `python3 deploy.py flash mister --no-reset`.
 
 To see a board's boot in detail, build with `--flags=-DBOOT_DEBUG` (mister
 only): it waits 8 s after power-on, printing the reset reason, so there is time
@@ -217,7 +217,7 @@ answers each with the same type OR'ed with `ACK` (0x80) and the same sequence
 number.
 
 - The trigger pings every 2 s; the link is OK while acks keep arriving.
-- Built by `fog.py`, the trigger knows the mister box's MAC from `boards.toml`
+- Built by `deploy.py`, the trigger knows the mister box's MAC from `boards.toml`
   (`-DMISTER_MAC`, its soft-AP MAC: on the S3 the base MAC with the locally
   administered bit set, `9c:…` → `9e:…`; on the C3 base + 1) and unicasts from boot,
   ignoring acks from any other board. Built without it, it broadcasts until

@@ -10,12 +10,12 @@ flash; it refuses to write when the chip type does not match.
 Each role has its own sketch directory: MISTER -> fog_mister/,
 TRIGGER -> fog_trigger/.
 
-  python3 fog.py list                        ports, MACs and the board on each
-  python3 fog.py identify /dev/ttyACM2       chip + MAC of a new board (boards.toml entry)
-  python3 fog.py build   mister|trigger|all
-  python3 fog.py flash   mister trigger      flash the last build
-  python3 fog.py deploy  all --monitor       build + flash, then serial output
-  python3 fog.py monitor mister trigger      serial output, prefixed with the board name
+  python3 deploy.py list                        ports, MACs and the board on each
+  python3 deploy.py identify /dev/ttyACM2       chip + MAC of a new board (boards.toml entry)
+  python3 deploy.py build   mister|trigger|all
+  python3 deploy.py flash   mister trigger      flash the last build
+  python3 deploy.py deploy  all --monitor       build + flash, then serial output
+  python3 deploy.py monitor mister trigger      serial output, prefixed with the board name
 
 Needs Python 3.11+ (tomllib), pyserial, arduino-cli with the esp32:esp32 core.
 """
@@ -128,7 +128,7 @@ def resolve(boards, n):
 def select(boards, names):
     """Board names, roles (any case) or 'all' -> list of boards, in boards.toml order."""
     if not names:
-        die("name a board, a role or 'all' (see 'fog.py list')")
+        die("name a board, a role or 'all' (see 'deploy.py list')")
     picked = []
     for n in names:
         hits, _ = resolve(boards, n)
@@ -167,15 +167,15 @@ def present(picked, required, port, wait_for_required=False):
             out.append(b)
         elif b["name"] in required:
             if why == "no mac in boards.toml":
-                die(f"{b['name']}: no mac in boards.toml yet; run 'fog.py identify <port>' and fill it in, or pass --port")
+                die(f"{b['name']}: no mac in boards.toml yet; run 'deploy.py identify <port>' and fill it in, or pass --port")
             if wait_for_required:
                 out.append(b)
             else:
-                die(f"{b['name']} ({b['mac']}) is not connected (see 'fog.py list')")
+                die(f"{b['name']} ({b['mac']}) is not connected (see 'deploy.py list')")
         else:
             print(f"(skipping {b['name']}: {why})")
     if not out:
-        die("none of the selected boards is connected (see 'fog.py list')")
+        die("none of the selected boards is connected (see 'deploy.py list')")
     return out
 
 
@@ -218,11 +218,11 @@ def find_port(board, override=None):
     if override:
         return override
     if not board["mac"]:
-        die(f"{board['name']}: no mac in boards.toml yet; run 'fog.py identify <port>' "
+        die(f"{board['name']}: no mac in boards.toml yet; run 'deploy.py identify <port>' "
             f"and fill it in, or pass --port")
     hits = [dev for dev, mac, _ in list_ports() if mac == board["mac"]]
     if not hits:
-        die(f"{board['name']} ({board['mac']}) is not connected (see 'fog.py list')")
+        die(f"{board['name']} ({board['mac']}) is not connected (see 'deploy.py list')")
     return hits[0]
 
 
@@ -327,7 +327,7 @@ def cmd_list(args, boards):
             seen.add(b["name"])
             print(f"{dev:14} {mac:18} {b['name']:16} {b['role']:11} {b['chip']}")
         else:
-            what = "unknown: fog.py identify " + dev if mac else "(no MAC: " + desc + ")"
+            what = "unknown: deploy.py identify " + dev if mac else "(no MAC: " + desc + ")"
             print(f"{dev:14} {mac or '-':18} {what}")
     for b in boards.values():
         if b["name"] not in seen:
@@ -391,7 +391,7 @@ def build(board, flags, args):
         die(f"build of {sketch} for {board['chip']} failed")
     boot_app0 = core_file("hardware/esp32/*/tools/partitions/boot_app0.bin")
     if not boot_app0:
-        die("boot_app0.bin not found in the esp32 core, run 'fog.py update'")
+        die("boot_app0.bin not found in the esp32 core, run 'deploy.py update'")
     shutil.copy(boot_app0, dst)
     with open(os.path.join(dst, "build.json"), "w") as f:
         json.dump({"sketch": sketch, "role": board["role"], "chip": board["chip"], "flags": flags,
@@ -422,7 +422,7 @@ def flash(board, args):
     bins = [(addr, os.path.join(src, name.format(sketch=sketch))) for addr, name in FLASH_LAYOUT]
     missing = [p for _, p in bins if not os.path.exists(p)]
     if missing:
-        die(f"{board['name']}: no build in {os.path.relpath(src, HERE)}, run 'fog.py deploy {board['name']}'")
+        die(f"{board['name']}: no build in {os.path.relpath(src, HERE)}, run 'deploy.py deploy {board['name']}'")
     try:
         with open(os.path.join(src, "build.json")) as f:
             info = json.load(f)
