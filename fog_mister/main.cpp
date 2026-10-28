@@ -23,7 +23,7 @@
 #define STOP_PIN        7   // toggle to GND, closed = everything off
 #define BUTTON_PIN      10  // push button to GND
 #if CONFIG_IDF_TARGET_ESP32S3
-#define LED_PIN         48  // on-board LED (S3 SuperMini: WS2812 RGB, shown blue)
+#define LED_PIN         48  // on-board LED (S3 SuperMini: WS2812 RGB, shown green; the trigger is blue)
 #define LED_RGB         1
 #define LED_RGB_LEVEL   40  // 0-255, it is bright
 #else
@@ -376,7 +376,7 @@ static void led(bool on) {
     if (on == last)
         return;
     last = on;
-    rgbLedWrite(LED_PIN, 0, 0, on ? LED_RGB_LEVEL : 0);
+    rgbLedWrite(LED_PIN, 0, on ? LED_RGB_LEVEL : 0, 0);
 #else
     digitalWrite(LED_PIN, (on ^ LED_ACTIVE_LOW) ? HIGH : LOW);
 #endif

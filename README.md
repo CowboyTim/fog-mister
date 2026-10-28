@@ -69,7 +69,7 @@ range.
 | GPIO5 | MOSFET #2 TRIG | Ultrasonic mister via SSR; 10 kΩ TRIG → GND |
 | GPIO7 | STOP toggle → GND | Closed = everything off |
 | GPIO10 | Push button → GND | Short = group coming, hold 2 s = undo |
-| GPIO48 | On-board RGB LED | WS2812 on the S3 SuperMini, shown blue (C3 build: GPIO8, active low) |
+| GPIO48 | On-board RGB LED | WS2812 on the S3 SuperMini, shown green (C3 build: GPIO8, active low) |
 | 5V / GND | Buck converter | Buck input from the 12 V supply |
 
 The SSR input is driven with a full 12 V (SSR + to +12 V, SSR − to MOSFET #2
