@@ -65,8 +65,8 @@ range.
 | Mister box pin | Goes to | Note |
 | --- | --- | --- |
 | GPIO3 | MAX485 DI | DMX out; VCC to 5 V, DE and /RE to 3V3, RO not connected |
-| GPIO4 | MOSFET #1 TRIG | Blower PWM, 20 kHz; 10 kΩ TRIG → GND |
-| GPIO5 | MOSFET #2 TRIG | Ultrasonic mister via SSR; 10 kΩ TRIG → GND |
+| GPIO4 | MOSFET #1 TRIG | Blower PWM, 20 kHz; 220 Ω in series, 10 kΩ TRIG → GND |
+| GPIO5 | MOSFET #2 TRIG | Ultrasonic mister via SSR; 220 Ω in series, 10 kΩ TRIG → GND |
 | GPIO7 | STOP toggle → GND | Closed = everything off |
 | GPIO10 | Push button → GND | Short = group coming, hold 2 s = undo |
 | GPIO48 | On-board RGB LED | WS2812 on the S3 SuperMini, shown green (C3 build: GPIO8, active low) |

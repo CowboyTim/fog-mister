@@ -97,6 +97,16 @@ class Svg:
         s.add(f'<polyline points="{d}" class="c"/>')
         s.text(x + 10, m + 4, label, "p")
 
+    def resistor_h(s, x1, x2, y, label):
+        m = (x1 + x2) / 2
+        pts = [(x1, y), (m - 14, y)]
+        for i in range(7):
+            pts.append((m - 14 + 4 * i + 2, y + (6 if i % 2 == 0 else -6)))
+        pts += [(m + 14, y), (x2, y)]
+        d = " ".join(f"{a},{b}" for a, b in pts)
+        s.add(f'<polyline points="{d}" class="c"/>')
+        s.text(m, y + 20, label, "p", "middle")
+
     def diode_v(s, x, y_cathode, y_anode, label):
         # anode at the bottom, cathode (bar) at the top: current flows up
         m = (y_cathode + y_anode) / 2
@@ -188,7 +198,9 @@ def mister(path):
 
     # MOSFET #1 -> blower
     s.box(700, 330, 180, 100, "MOSFET #1", ["blower PWM"])
-    s.wire([(550, 380), (700, 380)], "sig")
+    s.wire([(550, 380), (580, 380)], "sig")
+    s.resistor_h(580, 620, 380, "220 Ω")
+    s.wire([(620, 380), (700, 380)], "sig")
     s.text(600, 372, "PWM 20 kHz", "n")
     s.pin(700, 380, "TRIG", "l")
     s.dot(640, 380)
@@ -213,7 +225,9 @@ def mister(path):
 
     # MOSFET #2 -> SSR
     s.box(700, 500, 180, 100, "MOSFET #2", ["mister on/off"])
-    s.wire([(550, 520), (640, 520), (640, 550), (700, 550)], "sig")
+    s.wire([(550, 520), (580, 520)], "sig")
+    s.resistor_h(580, 620, 520, "220 Ω")
+    s.wire([(620, 520), (640, 520), (640, 550), (700, 550)], "sig")
     s.pin(700, 550, "TRIG", "l")
     s.dot(640, 550)
     s.resistor_v(640, 550, 610, "10 kΩ")
