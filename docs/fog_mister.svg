@@ -171,17 +171,17 @@ text{font-family:Helvetica,Arial,sans-serif;fill:#1d1d1f}
 <text x="1075.0" y="522" class="t" text-anchor="middle">SSR-40DD</text>
 <text x="1075" y="630" class="n" text-anchor="middle">heatsink, outside the cooler</text>
 <circle cx="1000" cy="545" r="2.8" fill="#fff" stroke="#333" stroke-width="1.3"/>
-<text x="1007" y="549" class="p" text-anchor="start">in+</text>
+<text x="1007" y="549" class="p" text-anchor="start">ctrl +</text>
 <polyline points="1000,545 984,545" class="w v12"/>
 <path d="M984,539 v12 l-8,-6 z" fill="#d22"/>
 <text x="972" y="549" class="p" text-anchor="end" style="fill:#d22;font-weight:bold">+12V</text>
 <circle cx="1000" cy="580" r="2.8" fill="#fff" stroke="#333" stroke-width="1.3"/>
-<text x="1007" y="584" class="p" text-anchor="start">in−</text>
+<text x="1007" y="584" class="p" text-anchor="start">ctrl −</text>
 <polyline points="880,580 1000,580" class="w sig"/>
 <circle cx="1150" cy="545" r="2.8" fill="#fff" stroke="#333" stroke-width="1.3"/>
-<text x="1143" y="549" class="p" text-anchor="end">out+</text>
+<text x="1143" y="549" class="p" text-anchor="end">DC in</text>
 <circle cx="1150" cy="580" r="2.8" fill="#fff" stroke="#333" stroke-width="1.3"/>
-<text x="1143" y="584" class="p" text-anchor="end">out−</text>
+<text x="1143" y="584" class="p" text-anchor="end">DC out</text>
 <rect x="1170" y="130" width="150" height="70" rx="6" class="dev"/>
 <text x="1245.0" y="152" class="t" text-anchor="middle">Mister brick</text>
 <text x="1245.0" y="169" class="s" text-anchor="middle">230 V AC → DC, 350 W</text>

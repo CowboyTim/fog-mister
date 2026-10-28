@@ -72,10 +72,12 @@ range.
 | GPIO48 | On-board RGB LED | WS2812 on the S3 SuperMini, shown green (C3 build: GPIO8, active low) |
 | 5V / GND | Buck converter | Buck input from the 12 V supply |
 
-The SSR input is driven with a full 12 V (SSR + to +12 V, SSR − to MOSFET #2
-OUT−), since 3.3 V is below its 4 V minimum. The ultrasonic mister's DC side is
-isolated behind the SSR and never shares the 12 V ground. Check that the mister brick's
-output is DC before using the DC-switching SSR-40DD.
+The SSR control input is driven with a full 12 V (ctrl + to +12 V, ctrl − to MOSFET #2
+OUT−), since 3.3 V is below its 4 V minimum. The mister brick's DC+ goes to the
+SSR's DC in, the SSR's DC out goes to the ultrasonic mister's +, and the mister's −
+returns to the brick's DC−. The mister's DC side is isolated behind the SSR and
+never shares the 12 V ground. Check that the mister brick's output is DC before
+using the DC-switching SSR-40DD.
 
 ![Trigger node schematic](docs/fog_trigger.svg)
 
