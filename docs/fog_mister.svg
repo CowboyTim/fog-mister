@@ -164,7 +164,7 @@ text{font-family:Helvetica,Arial,sans-serif;fill:#1d1d1f}
 <text x="790" y="593" class="p" text-anchor="middle">VIN−</text>
 <path d="M790,600 v10 M780,610 h20 M784,615 h12 M787.5,620 h5" class="c"/>
 <circle cx="880" cy="550" r="2.8" fill="#fff" stroke="#333" stroke-width="1.3"/>
-<text x="873" y="554" class="p" text-anchor="end">OUT+ (n.c.)</text>
+<text x="873" y="554" class="p" text-anchor="end">OUT+</text>
 <circle cx="880" cy="580" r="2.8" fill="#fff" stroke="#333" stroke-width="1.3"/>
 <text x="873" y="584" class="p" text-anchor="end">OUT−</text>
 <rect x="1000" y="500" width="150" height="110" rx="6" class="box"/>
@@ -172,9 +172,7 @@ text{font-family:Helvetica,Arial,sans-serif;fill:#1d1d1f}
 <text x="1075" y="630" class="n" text-anchor="middle">heatsink, outside the cooler</text>
 <circle cx="1000" cy="545" r="2.8" fill="#fff" stroke="#333" stroke-width="1.3"/>
 <text x="1007" y="549" class="p" text-anchor="start">ctrl +</text>
-<polyline points="1000,545 984,545" class="w v12"/>
-<path d="M984,539 v12 l-8,-6 z" fill="#d22"/>
-<text x="972" y="549" class="p" text-anchor="end" style="fill:#d22;font-weight:bold">+12V</text>
+<polyline points="880,550 940,550 940,545 1000,545" class="w v12"/>
 <circle cx="1000" cy="580" r="2.8" fill="#fff" stroke="#333" stroke-width="1.3"/>
 <text x="1007" y="584" class="p" text-anchor="start">ctrl −</text>
 <polyline points="880,580 1000,580" class="w sig"/>
@@ -203,8 +201,8 @@ text{font-family:Helvetica,Arial,sans-serif;fill:#1d1d1f}
 <text x="1190" y="280" class="n" text-anchor="end">isolated DC: never tied to GND</text>
 <text x="1190" y="294" class="n" text-anchor="end">check the brick's output is DC!</text>
 <rect x="700" y="650" width="180" height="150" rx="6" class="box"/>
-<text x="790.0" y="672" class="t" text-anchor="middle">MAX3485 module</text>
-<text x="790.0" y="689" class="s" text-anchor="middle">3.3 V RS-485</text>
+<text x="790.0" y="672" class="t" text-anchor="middle">MAX485 module</text>
+<text x="790.0" y="689" class="s" text-anchor="middle">5 V RS-485</text>
 <polyline points="550,660 620,660 620,700 700,700" class="w dmx"/>
 <text x="565" y="652" class="n" text-anchor="start">DMX 250 kbaud</text>
 <circle cx="700" cy="700" r="2.8" fill="#fff" stroke="#333" stroke-width="1.3"/>
@@ -219,16 +217,17 @@ text{font-family:Helvetica,Arial,sans-serif;fill:#1d1d1f}
 <text x="860" y="793" class="p" text-anchor="middle">GND</text>
 <path d="M860,800 v10 M850,810 h20 M854,815 h12 M857.5,820 h5" class="c"/>
 <polyline points="500,730 500,845 820,845" class="w v33"/>
-<polyline points="730,845 730,800" class="w v33"/>
+<polyline points="730,800 730,814" class="w v5"/>
+<path d="M724,814 h12 l-6,8 z" fill="#e07b00"/>
+<text x="730" y="836" class="p" text-anchor="middle" style="fill:#e07b00;font-weight:bold">+5V</text>
 <polyline points="775,845 775,800" class="w v33"/>
 <polyline points="820,845 820,800" class="w v33"/>
-<circle cx="730" cy="845" r="3.5" fill="#222"/>
 <circle cx="775" cy="845" r="3.5" fill="#222"/>
-<text x="560" y="863" class="n" text-anchor="start">VCC, DE and /RE to 3V3 (transmit only)</text>
+<text x="560" y="863" class="n" text-anchor="start">VCC to +5V; DE and /RE to 3V3 (transmit only)</text>
 <circle cx="880" cy="720" r="2.8" fill="#fff" stroke="#333" stroke-width="1.3"/>
-<text x="873" y="724" class="p" text-anchor="end">A</text>
+<text x="873" y="724" class="p" text-anchor="end">B</text>
 <circle cx="880" cy="745" r="2.8" fill="#fff" stroke="#333" stroke-width="1.3"/>
-<text x="873" y="749" class="p" text-anchor="end">B</text>
+<text x="873" y="749" class="p" text-anchor="end">A</text>
 <circle cx="880" cy="770" r="2.8" fill="#fff" stroke="#333" stroke-width="1.3"/>
 <text x="873" y="774" class="p" text-anchor="end">GND</text>
 <rect x="1170" y="660" width="200" height="130" rx="6" class="dev"/>
@@ -264,8 +263,8 @@ text{font-family:Helvetica,Arial,sans-serif;fill:#1d1d1f}
 <text x="344" y="964" class="p" text-anchor="start">isolated ultrasonic mister DC</text>
 <polyline points="300,980 334,980" class="w gnd"/>
 <text x="344" y="984" class="p" text-anchor="start">ground</text>
-<text x="560" y="924" class="p" text-anchor="start">All ground symbols are one common ground: 12 V supply −, buck, ESP32, MOSFET VIN−, MAX3485.</text>
-<text x="560" y="944" class="p" text-anchor="start">+12V flags all connect to the 12 V supply's + output. The ultrasonic mister's DC side stays isolated behind the SSR.</text>
+<text x="560" y="924" class="p" text-anchor="start">All ground symbols are one common ground: 12 V supply −, buck, ESP32, MOSFET VIN−, MAX485.</text>
+<text x="560" y="944" class="p" text-anchor="start">+12V flags connect to the 12 V supply's + output, +5V flags to the buck's 5 V output. The ultrasonic mister's DC side stays isolated behind the SSR.</text>
 <text x="560" y="964" class="p" text-anchor="start">10 kΩ pull-downs keep the MOSFETs off while the ESP32 boots. Diode band (cathode) to blower +.</text>
 <text x="560" y="984" class="p" text-anchor="start">Fog machine stand: horizontal, 50 cm clear around vents, 5 cm gap from nozzle to the duct.</text>
 </svg>

@@ -78,6 +78,10 @@ class Svg:
             s.wire([(x, y), (x, y - 14)], cls)
             s.add(f'<path d="M{x-6},{y-14} h12 l-6,-8 z" fill="{col}"/>')
             s.add(f'<text x="{x}" y="{y-27}" class="p" text-anchor="middle" style="fill:{col};font-weight:bold">{label}</text>')
+        elif direction == "down":
+            s.wire([(x, y), (x, y + 14)], cls)
+            s.add(f'<path d="M{x-6},{y+14} h12 l-6,8 z" fill="{col}"/>')
+            s.add(f'<text x="{x}" y="{y+36}" class="p" text-anchor="middle" style="fill:{col};font-weight:bold">{label}</text>')
         else:  # left
             s.wire([(x, y), (x - 16, y)], cls)
             s.add(f'<path d="M{x-16},{y-6} v12 l-8,-6 z" fill="{col}"/>')
@@ -218,12 +222,13 @@ def mister(path):
     s.tag(790, 500, "+12V")
     s.pin(790, 600, "VIN−", "b")
     s.gnd(790, 600)
-    s.pin(880, 550, "OUT+ (n.c.)", "r")
+    s.pin(880, 550, "OUT+", "r")
     s.pin(880, 580, "OUT−", "r")
     s.box(1000, 500, 150, 110, "SSR-40DD", [])
     s.text(1075, 630, "heatsink, outside the cooler", "n", "middle")
     s.pin(1000, 545, "ctrl +", "l")
-    s.tag(1000, 545, "+12V", direction="left")
+    # OUT+ is the module's 12 V pass-through; the SSR control + hangs on it
+    s.wire([(880, 550), (940, 550), (940, 545), (1000, 545)], "v12")
     s.pin(1000, 580, "ctrl −", "l")
     s.wire([(880, 580), (1000, 580)], "sig")
     s.pin(1150, 545, "DC in", "r")
@@ -243,7 +248,7 @@ def mister(path):
     s.text(1190, 294, "check the brick's output is DC!", "n", "end")
 
     # DMX
-    s.box(700, 650, 180, 150, "MAX3485 module", ["3.3 V RS-485"])
+    s.box(700, 650, 180, 150, "MAX485 module", ["5 V RS-485"])
     s.wire([(550, 660), (620, 660), (620, 700), (700, 700)], "dmx")
     s.text(565, 652, "DMX 250 kbaud", "n")
     s.pin(700, 700, "DI", "l")
@@ -253,13 +258,14 @@ def mister(path):
     s.pin(860, 800, "GND", "b")
     s.gnd(860, 800)
     s.wire([(500, 730), (500, 845), (820, 845)], "v33")
-    for x in (730, 775, 820):
+    s.tag(730, 800, "+5V", cls="v5", direction="down")
+    for x in (775, 820):
         s.wire([(x, 845), (x, 800)], "v33")
-    for x in (730, 775):
-        s.dot(x, 845)
-    s.text(560, 863, "VCC, DE and /RE to 3V3 (transmit only)", "n")
-    s.pin(880, 720, "A", "r")
-    s.pin(880, 745, "B", "r")
+    s.dot(775, 845)
+    s.text(560, 863, "VCC to +5V; DE and /RE to 3V3 (transmit only)", "n")
+    # MAX485: B is the non-inverting line, so B goes to XLR pin 3 (Data+)
+    s.pin(880, 720, "B", "r")
+    s.pin(880, 745, "A", "r")
     s.pin(880, 770, "GND", "r")
     s.box(1170, 660, 200, 130, "BeamZ BLAZE1200", ["DMX mode, addr 1, ch 1 = fog"], "dev")
     s.pin(1170, 720, "pin 3 Data+", "l")
@@ -276,8 +282,8 @@ def mister(path):
     s.add("</g>")
     s.legend(40, 920, [("mains", "230 V AC"), ("v12", "+12 V"), ("v5", "+5 V"), ("v33", "+3.3 V")])
     s.legend(300, 920, [("sig", "logic signal"), ("dmx", "DMX / RS-485"), ("iso", "isolated ultrasonic mister DC"), ("gnd", "ground")])
-    s.text(560, 924, "All ground symbols are one common ground: 12 V supply −, buck, ESP32, MOSFET VIN−, MAX3485.", "p")
-    s.text(560, 944, "+12V flags all connect to the 12 V supply's + output. The ultrasonic mister's DC side stays isolated behind the SSR.", "p")
+    s.text(560, 924, "All ground symbols are one common ground: 12 V supply −, buck, ESP32, MOSFET VIN−, MAX485.", "p")
+    s.text(560, 944, "+12V flags connect to the 12 V supply's + output, +5V flags to the buck's 5 V output. The ultrasonic mister's DC side stays isolated behind the SSR.", "p")
     s.text(560, 964, "10 kΩ pull-downs keep the MOSFETs off while the ESP32 boots. Diode band (cathode) to blower +.", "p")
     s.text(560, 984, "Fog machine stand: horizontal, 50 cm clear around vents, 5 cm gap from nozzle to the duct.", "p")
     s.save(path)

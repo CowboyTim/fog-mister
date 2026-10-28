@@ -44,7 +44,7 @@ range.
 
 **Mister box**
 
-- BeamZ BLAZE1200 fog machine, driven over DMX through a MAX3485 (3.3 V)
+- BeamZ BLAZE1200 fog machine, driven over DMX through a MAX485 (5 V)
   RS-485 module and a cut 3-pin XLR cable
 - 8-head ultrasonic mister on its own DC brick, switched by an SSR-40DD
 - 3" 12 V bilge blower, PWM through a dual-MOSFET module, SS34/1N5822 flyback
@@ -64,7 +64,7 @@ range.
 
 | Mister box pin | Goes to | Note |
 | --- | --- | --- |
-| GPIO3 | MAX3485 DI | DMX out; DE and /RE to 3V3 |
+| GPIO3 | MAX485 DI | DMX out; VCC to 5 V, DE and /RE to 3V3, RO not connected |
 | GPIO4 | MOSFET #1 TRIG | Blower PWM, 20 kHz; 10 kΩ TRIG → GND |
 | GPIO5 | MOSFET #2 TRIG | Ultrasonic mister via SSR; 10 kΩ TRIG → GND |
 | GPIO7 | STOP toggle → GND | Closed = everything off |
@@ -72,8 +72,9 @@ range.
 | GPIO48 | On-board RGB LED | WS2812 on the S3 SuperMini, shown green (C3 build: GPIO8, active low) |
 | 5V / GND | Buck converter | Buck input from the 12 V supply |
 
-The SSR control input is driven with a full 12 V (ctrl + to +12 V, ctrl − to MOSFET #2
-OUT−), since 3.3 V is below its 4 V minimum. The mister brick's DC+ goes to the
+The SSR control input is driven with a full 12 V (ctrl + to MOSFET #2 OUT+, ctrl − to
+MOSFET #2 OUT−), since 3.3 V is below its 4 V minimum. OUT+ must carry the 12 V
+through the module: check continuity between VIN+ and OUT+ with the module unpowered. The mister brick's DC+ goes to the
 SSR's DC in, the SSR's DC out goes to the ultrasonic mister's +, and the mister's −
 returns to the brick's DC−. The mister's DC side is isolated behind the SSR and
 never shares the 12 V ground. Check that the mister brick's output is DC before

@@ -17,7 +17,7 @@
 #include <esp_wifi.h>
 
 /* ---- pins ---- */
-#define DMX_TX_PIN      3   // MAX3485 DI
+#define DMX_TX_PIN      3   // MAX485 DI
 #define BLOWER_PIN      4   // MOSFET module #1 TRIG/PWM
 #define MISTER_PIN      5   // MOSFET module #2 TRIG -> SSR input
 #define STOP_PIN        7   // toggle to GND, closed = everything off
