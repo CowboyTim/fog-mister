@@ -47,8 +47,8 @@ range.
 - BeamZ BLAZE1200 fog machine, driven over DMX through a MAX485 (5 V)
   RS-485 module and a cut 3-pin XLR cable
 - 8-head ultrasonic mister on its own DC brick, switched by an SSR-40DD
-- 3" 12 V bilge blower, PWM through a dual-MOSFET module, SS34/1N5822 flyback
-  diode across it
+- 3" 12 V bilge blower (3.0 A), PWM through a dual-MOSFET module, 5 A 40 V
+  Schottky flyback diode across it (e.g. SB540)
 - 12 V 60 W supply, 12 → 5 V buck converter for the ESP32
 - STOP toggle switch and a push button
 - Mains via a portable 30 mA RCD from a Fossibot F2400

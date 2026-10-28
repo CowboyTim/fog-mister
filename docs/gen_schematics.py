@@ -208,7 +208,7 @@ def mister(path):
     s.wire([(880, 380), (1060, 380)], "v12")
     s.wire([(880, 410), (1060, 410)], "gnd")
     s.dot(990, 380); s.dot(990, 410)
-    s.diode_v(990, 380, 410, "SS34 / 1N5822")
+    s.diode_v(990, 380, 410, "SB540")
     s.text(905, 372, "red", "n"); s.text(905, 428, "black", "n")
 
     # MOSFET #2 -> SSR
