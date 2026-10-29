@@ -45,7 +45,9 @@ range.
 **Mister box**
 
 - BeamZ BLAZE1200 fog machine, driven over DMX through a MAX485 (5 V)
-  RS-485 module and a cut 3-pin XLR cable
+  RS-485 module, a female panel-mount XLR on the box and a 3-pin XLR cable
+  (male at the box, female into the fogger's DMX IN). A 120 Ω terminator
+  plug goes in its DMX OUT. The REMOTE socket is not used.
 - 8-head ultrasonic mister on its own DC brick, switched by an SSR-40DD
 - 3" 12 V bilge blower (3.0 A), PWM through a dual-MOSFET module, 5 A 40 V
   Schottky flyback diode across it (e.g. SB540)
